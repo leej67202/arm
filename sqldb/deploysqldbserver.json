@@ -242,7 +242,7 @@
       "type" : "string"
     },
     "deploySQLDBIdResult": {
-      "value": "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlServerName'))]",
+      "value": "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlDBName'))]",
       "type" : "string"
     }
   }
