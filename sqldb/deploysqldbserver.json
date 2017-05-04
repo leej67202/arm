@@ -205,7 +205,7 @@
                     "resources": [
                         {
                         "comments": "Transparent Data Encryption",
-                        "name": "sqlDBTDE",
+                        "name": "current",
                         "type": "transparentDataEncryption",
                         "apiVersion": "2014-04-01-preview",
                         "properties": {
