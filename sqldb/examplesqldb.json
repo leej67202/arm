@@ -7,7 +7,7 @@
             "type": "string"
         },
         "admin_name": {
-            "defaultValue": "sqlsev01",
+            "defaultValue": "sqladmin",
             "type": "string"
         },
         "admin_password": {

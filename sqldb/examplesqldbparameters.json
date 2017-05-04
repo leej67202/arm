@@ -2,13 +2,13 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "resourcePrefix": {
-        "value": "sach"
-	  },
-    "sqlServerNamePrefix": {
+    "server_name": {
         "value": "sqlsev01"
 	  },
-  "sqlServerAdminPassword": {
+    "admin_name": {
+        "value": "sqladmin"
+	  },
+  "admin_password": {
       "reference": {
         "keyVault": {
             "id": "use key vault resource id"
@@ -16,17 +16,14 @@
           "secretName": "secret from your key vault"
         }
       },
-      "sqlServerAdminLogin": {
-        "value": "sqladmin"
-      },
-    "serviceTagDept": {
-      "value": "IT Ops"
+    "database_name": {
+      "value": "sqldb01"
     },
-    "serviceTagEnvironment": {
-      "value": "Staging"
+    "database_collation": {
+      "value": "SQL_Latin1_General_CP1_CI_AS"
     },
-    "serviceTagDataProfile": {
-      "value": "Internal"
+    "firewallRules_AllowAllWindowsAzureIps_name": {
+      "value": "AllowAllWindowsAzureIps"
     }
   }
 }
