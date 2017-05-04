@@ -1,0 +1,30 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourcePrefix": {
+      "value": "prefix"
+	  },
+    "publicIPNamePrefix": {
+      "value": "pip01"
+	  },
+    "publicIPAllocationMethod": {
+        "value": "Dynamic"
+    },
+    "publicIPAddressVersion": {
+        "value": "IPv4"
+    },
+    "publicIPTimeout": {
+        "value": 5
+    },
+    "serviceTagDept": {
+      "value": "IT Ops"
+    },
+    "serviceTagEnvironment": {
+      "value": "Staging"
+    },
+    "serviceTagDataProfile": {
+      "value": "Internal"
+    }
+  }
+}

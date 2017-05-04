@@ -1,0 +1,155 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {
+  "resourcePrefix": {
+      "type": "string",
+      "maxLength": 10,
+      "defaultValue": "each",
+      "metadata": {
+      "description": "Resource prefix"
+      }
+    },
+  "nicNamePrefix": {
+    "type": "string",
+    "maxLength": 10,
+    "defaultValue": "nic",
+    "metadata": {
+      "description": "nic prefix"
+    }
+    },
+  "privateIPAllocationMethod": {
+    "type": "string",
+      "allowedValues": [
+      "Dynamic",
+      "Static"
+    ],
+    "defaultValue": "Dynamic"
+    },
+  "privateIPAddressVersion": {
+    "type": "string",
+      "allowedValues": [
+      "IPv4",
+      "IPv6"
+    ],
+    "defaultValue": "IPv4"
+    },
+  "serviceTagDept": {
+    "type": "string",
+    "allowedValues": [
+      "IT Ops",
+      "IT Dev",
+      "Finance",
+      "Marketing",
+      "Management",
+      "Sales",
+      "HR"
+    ],
+    "defaultValue": "IT Ops",
+    "metadata": {
+      "description": "The service Tag value for the company"
+    }
+  },
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+"variables": {
+  "resourcePrefix": "[parameters('resourcePrefix')]",
+  "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
+  "networkTemplateUrl": "[concat(variables('templateBaseUrl'), 'network/deployvnet.json')]",
+  "networkParameterUrl": "[concat(variables('templateBaseUrl'), 'network/vnetparameters.json')]",
+  "nicName": "[concat(variables('resourcePrefix'), parameters('nicNamePrefix'))]"
+},
+    "resources": [
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deployvnetTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('networkTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('networkParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
+            "name": "[variables('nicName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-09-01",
+            "location": "[resourceGroup().location]",
+                "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+      },
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAddressVersion": "[parameters('privateIPAddressVersion')]",
+                            "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
+                            "subnet": {
+                              "id": "[concat(reference('deployvnetTemplate').outputs.deployvnetIdResult.value, reference('deployvnetTemplate').outputs.deployFESubnetIdResult.value)]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                  "id": "[reference('deployvnetTemplate').outputs.deployFENSGNameResult.value]"
+                }
+            }
+        }
+    ],
+  "outputs": {
+    "deploynicResult": {
+      "value": "[reference(concat('Microsoft.Network/networkInterfaces/', variables('nicName')),providers('Microsoft.Network', 'networkInterfaces').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deploynicIdResult": {
+      "type" : "string",
+      "value": "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+    },
+    "deploySubnetResult": {
+      "type" : "string",
+      "value": "[reference('deployvnetTemplate').outputs.deployFESubnetIdResult.value]"
+    },
+    "deployNSGResult": {
+      "type" : "string",
+      "value": "[reference('deployvnetTemplate').outputs.deployFENSGNameResult.value]"
+    }
+  }
+}

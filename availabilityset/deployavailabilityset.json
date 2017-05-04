@@ -1,0 +1,121 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 60,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Availability Set prefix"
+                }
+            },
+            "availabilitySetNamePrefix": {
+            "type": "string",
+            "maxLength": 60,
+            "defaultValue": "as01",
+            "metadata": {
+            "description": "Availability Set name prefix"
+                }
+            },
+            "availabilitySetUpdateDomainCount": {
+            "type": "int",
+            "maxValue": 20,
+            "minValue": 2,
+            "defaultValue": 5,
+            "metadata": {
+            "description": "Platform Update Domain Count"
+                }
+            },
+            "availabilitySetFaultDomainCount": {
+            "type": "int",
+            "maxValue": 3,
+            "minValue": 1,
+            "defaultValue": 2,
+            "metadata": {
+            "description": "Platform Fault Domain Count"
+                }
+            },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "availabilitySetName": "[concat(variables('resourcePrefix'),parameters('availabilitySetNamePrefix'))]"
+    },
+    "resources": [
+        {
+            "comments": "Rebuild",
+            "type": "Microsoft.Compute/availabilitySets",
+            "sku": {
+                "name": "Aligned"
+            },
+            "name": "[variables('availabilitySetName')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "properties": {
+                "platformUpdateDomainCount": "[int(parameters('availabilitySetUpdateDomainCount'))]",
+                "platformFaultDomainCount": "[int(parameters('availabilitySetFaultDomainCount'))]",
+                "virtualMachines": []
+            },
+            "dependsOn": []
+        }
+    ],
+  "outputs": {
+    "deployavailabilitysetResult": {
+      "value": "[reference(concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName')),providers('Microsoft.Compute', 'availabilitySets').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deployasIdResult": {
+      "value": "[resourceid('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+      "type" : "string"
+    }
+  }
+}

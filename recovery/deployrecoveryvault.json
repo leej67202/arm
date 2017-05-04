@@ -1,0 +1,114 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 15,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Recovery services vault prefix"
+                }
+            },
+            "recoveryVaultNamePrefix": {
+            "type": "string",
+            "maxLength": 20,
+            "defaultValue": "rsv01",
+            "metadata": {
+            "description": "Recovery services vault name prefix"
+                }
+            },
+            "recoveryVaultSkuName": {
+            "type": "string",
+            "defaultValue": "RS0",
+            "metadata": {
+            "description": "Recovery services vault Sku Name"
+                }
+            },
+            "recoveryVaultSkuTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": {
+            "description": "Recovery Vault Sku Tier"
+                }
+            },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "vaultName": "[concat(variables('resourcePrefix'),parameters('recoveryVaultNamePrefix'))]"
+    },
+    "resources": [
+                {
+            "comments": "https://docs.microsoft.com/en-us/azure/templates/microsoft.recoveryservices/vaults",
+            "type": "Microsoft.RecoveryServices/vaults",
+            "sku": {
+                "name": "[parameters('recoveryVaultSkuName')]",
+                "tier": "[parameters('recoveryVaultSkuTier')]"
+            },
+            "name": "[variables('vaultName')]",
+            "apiVersion": "2016-06-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "properties": {},
+            "dependsOn": []
+        }
+    ],
+  "outputs": {
+    "deployavailabilitysetResult": {
+      "value": "[reference(concat('Microsoft.RecoveryServices/vaults/', variables('vaultName')),providers('Microsoft.RecoveryServices', 'vaults').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deployasIdResult": {
+      "value": "[resourceid('Microsoft.RecoveryServices/vaults/', variables('vaultName'))]",
+      "type" : "string"
+    }
+  }
+}

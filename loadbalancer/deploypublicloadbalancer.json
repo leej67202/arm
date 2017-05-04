@@ -1,0 +1,143 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 15,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "public load balancer prefix"
+                }
+            },
+            "publicLoadBalancerNamePrefix": {
+            "type": "string",
+            "maxLength": 20,
+            "defaultValue": "plb01",
+            "metadata": {
+            "description": "public load balancer name prefix"
+                }
+            },
+            "publicIPAddressNamePrefix": {
+            "type": "string",
+            "defaultValue": "pip01",
+            "metadata": {
+            "description": "Public IP address name"
+                }
+            },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
+        "pipTemplateUrl": "[concat(variables('templateBaseUrl'), 'pip/deploypip.json')]",
+        "publicLoadBalancerName": "[concat(variables('resourcePrefix'),parameters('publicLoadBalancerNamePrefix'))]",
+        "pipName": "[concat(parameters('publicLoadBalancerNamePrefix'), parameters('publicIPAddressNamePrefix'))]"
+    },
+    "resources": [
+        {
+        "apiVersion": "2015-01-01",
+        "name": "deploypipTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('pipTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+              "resourcePrefix":{
+                "value": "[parameters('resourcePrefix')]"
+              },
+              "publicIPNamePrefix": {
+                "value": "[variables('pipName')]"
+                }
+              } 
+            }
+        },
+        {
+            "comments": "https://docs.microsoft.com/en-us/azure/templates/microsoft.network/loadbalancers",
+            "apiVersion": "2016-03-30",
+            "name": "[variables('publicLoadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "dependsOn": [],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id":  "[reference('deploypipTemplate').outputs.deploypipIdResult.value]"
+                            }
+                        }
+                    }
+                ],
+            "backendAddressPools": [],
+            "loadBalancingRules": [],
+            "probes": [],
+            "inboundNatRules": [],
+            "outboundNatRules": [],
+            "inboundNatPools": []
+            }
+        }
+    ],
+  "outputs": {
+    "deployavailabilitysetResult": {
+      "value": "[reference(concat('Microsoft.Network/loadBalancers/', variables('publicLoadBalancerName')),providers('Microsoft.Network', 'loadBalancers').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deployasIdResult": {
+      "value": "[resourceid('Microsoft.Network/loadBalancers/', variables('publicLoadBalancerName'))]",
+      "type" : "string"
+    }
+  }
+}

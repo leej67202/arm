@@ -1,0 +1,78 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
+    "networkTemplateUrl": "[concat(variables('templateBaseUrl'), 'network/deployvnet.json')]",
+    "networkParameterUrl": "[concat(variables('templateBaseUrl'), 'network/vnetparameters.json')]",
+    "storageTemplateUrl": "[concat(variables('templateBaseUrl'), 'storage/deploystorage.json')]",
+    "storageParameterUrl": "[concat(variables('templateBaseUrl'), 'storage/storageparameters.json')]",
+    "availabilitysetTemplateUrl": "[concat(variables('templateBaseUrl'), 'availabilityset/deployavailabilityset.json')]",
+    "availabilitysetParameterUrl": "[concat(variables('templateBaseUrl'), 'availabilityset/availabilitysetparameters.json')]"
+  },
+"resources": [
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deployvnetTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('networkTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('networkParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deploystorageTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('storageTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('storageParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deployavailabilitysetTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('availabilitysetTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('availabilitysetParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        }
+],
+  "outputs": {
+    "deployvnetResult": {
+      "type": "object",
+      "value": "[reference('deployvnetTemplate').outputs.deployvnetResult]"
+    },
+    "deploystorageResult": {
+      "type": "object",
+      "value": "[reference('deploystorageTemplate').outputs.deploystorageResult]"
+    },
+    "deployavailabilitysetResult": {
+      "type": "object",
+      "value": "[reference('deployavailabilitysetTemplate').outputs.deployavailabilitysetResult]"
+    }
+  }
+}

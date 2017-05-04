@@ -1,0 +1,104 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {
+  "resourcePrefix": {
+      "type": "string",
+      "maxLength": 15,
+      "defaultValue": "prefix",
+      "metadata": {
+      "description": "Resource prefix"
+      }
+    },
+  "dbAccountNamePrefix": {
+    "type": "string",
+    "maxLength": 15,
+    "defaultValue": "ddb01",
+    "metadata": {
+      "description": "The IP name prefix"
+    }
+  },
+  "serviceTagDept": {
+    "type": "string",
+    "allowedValues": [
+      "IT Ops",
+      "IT Dev",
+      "Finance",
+      "Marketing",
+      "Management",
+      "Sales",
+      "HR"
+    ],
+    "defaultValue": "IT Ops",
+    "metadata": {
+      "description": "The service Tag value for the company"
+    }
+  },
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+"variables": {
+  "resourcePrefix": "[parameters('resourcePrefix')]",
+  "dDBAccountName": "[concat(variables('resourcePrefix'),parameters('dbAccountNamePrefix'))]"
+},
+  "resources": [
+        {
+            "comments": "/providers/Microsoft.DocumentDB/databaseAccounts/yourdocumentdbname",
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "kind": "GlobalDocumentDB",
+            "name": "[variables('dDBAccountName')]",
+            "apiVersion": "2015-04-08",
+            "location": "[resourceGroup().location]",
+            "tags": {
+              "Department": "[parameters('serviceTagDept')]",
+              "Owner": "[parameters('serviceTagDept')]",
+              "Cost Centre": "[parameters('serviceTagDept')]",
+              "Environment": "[parameters('serviceTagEnvironment')]",
+              "Data Profile": "[parameters('serviceTagDataProfile')]"
+              },
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session"
+                },
+                "name": "[variables('dDBAccountName')]"
+            },
+            "dependsOn": []
+        }
+],
+  "outputs": {
+    "deploypipResult": {
+      "value": "[reference(concat('Microsoft.DocumentDB/databaseAccounts/', variables('dDBAccountName')),providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deploydocumentDBIdResult": {
+      "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('dDBAccountName'))]",
+      "type" : "string"
+    }
+  }
+}

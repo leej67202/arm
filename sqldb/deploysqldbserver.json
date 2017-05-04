@@ -1,0 +1,249 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {
+  "resourcePrefix": {
+      "type": "string",
+      "maxLength": 10,
+      "defaultValue": "prefix",
+      "metadata": {
+      "description": "Resource prefix"
+      }
+    },
+  "sqlServerNamePrefix": {
+    "type": "string",
+    "maxLength": 10,
+    "defaultValue": "sqlsev01",
+    "metadata": {
+      "description": "SQL DB name prefix"
+    }
+  },
+  "sqlServerAdminLogin": {
+      "type": "string",
+      "maxLength": 30,
+      "metadata": {
+      "description": "SQL Server Admin Login Name"
+      }
+    },
+  "sqlServerAdminPassword": {
+    "type": "securestring",
+    "metadata": {
+      "description": "SQL Server Admin Password"
+    }
+  },
+  "sqlDBNamePrefix": {
+    "type": "string",
+    "maxLength": 10,
+    "defaultValue": "sqldb01",
+    "metadata": {
+      "description": "SQL DB name prefix"
+    }
+  },
+    "sqlDBCollation": {
+        "type": "string",
+        "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+        },
+    "sqlDBEdition": {
+        "type": "string",
+        "allowedValues": [
+        "Web",
+        "Business",
+        "Basic",
+        "Standard",
+        "Premium",
+        "Free",
+        "Stretch",
+        "DataWarehouse"
+        ],
+        "defaultValue": "Standard"
+        },
+    "serviceLevelObjective": {
+        "type": "string",
+        "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3"
+        ],
+        "defaultValue": "S0"
+        },
+    "requestedServiceObjectiveName": {
+        "type": "string",
+        "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3"
+        ],
+        "defaultValue": "S0"
+        },
+    "version": {
+        "type": "string",
+        "defaultValue": "12.0"
+    },
+    "sqlDBTransparentDataEncryption": {
+      "type": "string",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
+      }
+    },
+  "serviceTagDept": {
+    "type": "string",
+    "allowedValues": [
+      "IT Ops",
+      "IT Dev",
+      "Finance",
+      "Marketing",
+      "Management",
+      "Sales",
+      "HR"
+    ],
+    "defaultValue": "IT Ops",
+    "metadata": {
+      "description": "The service Tag value for the company"
+    }
+  },
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+"variables": {
+  "resourcePrefix": "[parameters('resourcePrefix')]",
+  "sqlServerName": "[concat(variables('resourcePrefix'),parameters('sqlServerNamePrefix'))]",
+  "sqlDBName": "[concat(variables('resourcePrefix'),parameters('sqlDBNamePrefix'))]"
+},
+"resources": [
+        {   
+            "apiVersion": "2014-04-01-preview",
+            "type": "Microsoft.Sql/servers",
+            "kind": "v12.0",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+                },
+            "name": "[variables('sqlServerName')]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlServerAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+                "version": "[parameters('version')]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "2014-04-01-preview",
+                    "type": "databases",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                        "tags": {
+                        "Department": "[parameters('serviceTagDept')]",
+                        "Owner": "[parameters('serviceTagDept')]",
+                        "Cost Centre": "[parameters('serviceTagDept')]",
+                        "Environment": "[parameters('serviceTagEnvironment')]",
+                        "Data Profile": "[parameters('serviceTagDataProfile')]"
+                        },
+                    "name": "[variables('sqlDBName')]",
+                    "properties": {
+                        "collation": "[parameters('sqlDBCollation')]",
+                        "edition": "[parameters('sqlDBEdition')]",
+                        "status": "Online",
+                        "serviceLevelObjective": "[parameters('serviceLevelObjective')]",
+                        "requestedServiceObjectiveName": "[parameters('requestedServiceObjectiveName')]",
+                        "sampleName": null,
+                        "earliestRestoreDate": null,
+                        "elasticPoolName": null,
+                        "containmentState": 2,
+                        "readScale": "Disabled",
+                        "failoverGroupId": null
+                    },
+                    "resources": [
+                        {
+                        "comments": "Transparent Data Encryption",
+                        "name": "current",
+                        "type": "transparentDataEncryption",
+                        "apiVersion": "2014-04-01-preview",
+                        "properties": {
+                        "status": "[parameters('sqlDBTransparentDataEncryption')]"
+                        },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlDBName'))]"
+                                ]   
+                        }
+                                ]
+                      }
+                    ]
+                  },
+              {
+              "apiVersion": "2014-04-01-preview",
+                "type": "Microsoft.Sql/servers/firewallrules",
+                "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+                    ],
+                "location": "[resourceGroup().location]",
+                "name": "AllowAllWindowsAzureIps",
+                "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    }
+              }
+    ],
+  "outputs": {
+    "deployDiskResult": {
+      "value": "[reference(concat('Microsoft.Sql/servers/', variables('sqlServerName')),providers('Microsoft.Sql', 'servers').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deploySQLServerIdResult": {
+      "value": "[resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))]",
+      "type" : "string"
+    },
+    "deploySQLServerFQDN": {
+      "value": "[reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName]",
+      "type" : "string"
+    },
+    "deploySQLDBIdResult": {
+      "value": "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlServerName'))]",
+      "type" : "string"
+    }
+  }
+}

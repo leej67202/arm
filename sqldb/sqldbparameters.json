@@ -1,0 +1,32 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourcePrefix": {
+        "value": "sach"
+	  },
+    "sqlServerNamePrefix": {
+        "value": "sqlsev01"
+	  },
+  "sqlServerAdminPassword": {
+      "reference": {
+        "keyVault": {
+            "id": "use key vault resource id"
+          },
+          "secretName": "secret from your key vault"
+        }
+      },
+      "sqlServerAdminLogin": {
+        "value": "sqladmin"
+      },
+    "serviceTagDept": {
+      "value": "IT Ops"
+    },
+    "serviceTagEnvironment": {
+      "value": "Staging"
+    },
+    "serviceTagDataProfile": {
+      "value": "Internal"
+    }
+  }
+}

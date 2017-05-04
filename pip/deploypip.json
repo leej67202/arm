@@ -1,0 +1,128 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {
+  "resourcePrefix": {
+      "type": "string",
+      "maxLength": 15,
+      "defaultValue": "prefix",
+      "metadata": {
+      "description": "Resource prefix"
+      }
+    },
+  "publicIPNamePrefix": {
+    "type": "string",
+    "maxLength": 15,
+    "defaultValue": "pip01",
+    "metadata": {
+      "description": "The IP name prefix"
+    }
+  },
+  "publicIPAllocationMethod": {
+    "type": "string",
+    "allowedValues": [
+      "Static",
+      "Dynamic"
+    ],
+    "defaultValue": "Dynamic",
+    "metadata": {
+      "description": "The IP Allocation Method"
+    }
+  },
+  "publicIPAddressVersion": {
+    "type": "string",
+    "allowedValues": [
+      "IPv4",
+      "IPv6"
+    ],
+    "defaultValue": "IPv4",
+    "metadata": {
+      "description": "The IP Version"
+    }
+  },
+  "publicIPTimeout": {
+    "type": "int",
+    "defaultValue": 5,
+    "metadata": {
+      "description": "The idle timeout of the public IP address."
+    }
+  },
+  "serviceTagDept": {
+    "type": "string",
+    "allowedValues": [
+      "IT Ops",
+      "IT Dev",
+      "Finance",
+      "Marketing",
+      "Management",
+      "Sales",
+      "HR"
+    ],
+    "defaultValue": "IT Ops",
+    "metadata": {
+      "description": "The service Tag value for the company"
+    }
+  },
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+"variables": {
+  "resourcePrefix": "[parameters('resourcePrefix')]",
+  "pipName": "[concat(variables('resourcePrefix'),parameters('publicIPNamePrefix'))]"
+},
+  "resources": [
+  {
+  "name": "[variables('pipName')]",
+  "type": "Microsoft.Network/publicIPAddresses",
+  "apiVersion": "2016-09-01",
+  "location": "[resourceGroup().location]",
+  "tags": {
+      "Department": "[parameters('serviceTagDept')]",
+      "Owner": "[parameters('serviceTagDept')]",
+      "Cost Centre": "[parameters('serviceTagDept')]",
+      "Environment": "[parameters('serviceTagEnvironment')]",
+      "Data Profile": "[parameters('serviceTagDataProfile')]"
+      },
+  "properties": {
+    "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
+    "publicIPAddressVersion": "[parameters('publicIPAddressVersion')]",
+    "idleTimeoutInMinutes": "[int(parameters('publicIPTimeout'))]"
+  }
+}
+],
+  "outputs": {
+    "deploypipResult": {
+      "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('pipName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deploypipIdResult": {
+      "value": "[resourceId('Microsoft.Network/publicIPAddresses/', variables('pipName'))]",
+      "type" : "string"
+    }
+  }
+}

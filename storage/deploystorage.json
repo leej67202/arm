@@ -1,0 +1,141 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {
+  "resourcePrefix": {
+      "type": "string",
+      "maxLength": 10,
+      "defaultValue": "prefix",
+      "metadata": {
+      "description": "Resource prefix"
+      }
+    },
+  "storageNamePrefix": {
+    "type": "string",
+    "maxLength": 11,
+    "defaultValue": "sa01",
+    "metadata": {
+      "description": "Storage account prefix"
+    }
+  },
+    "storageTier": {
+    "type": "string",
+    "allowedValues": [
+      "Standard",
+      "Premium"
+    ],
+    "defaultValue": "Standard",
+    "metadata": {
+      "description": "The storage Tier of storage account."
+    }
+  },
+  "storageSKU": {
+    "type": "string",
+    "allowedValues": [
+      "Standard_LRS",
+      "Standard_ZRS",
+      "Standard_GRS",
+      "Standard_RAGRS",
+      "Premium_LRS"
+    ],
+    "defaultValue": "Standard_LRS",
+    "metadata": {
+      "description": "The type of replication to use for the storage account."
+    }
+  },
+  "serviceTagDept": {
+    "type": "string",
+    "allowedValues": [
+      "IT Ops",
+      "IT Dev",
+      "Finance",
+      "Marketing",
+      "Management",
+      "Sales",
+      "HR"
+    ],
+    "defaultValue": "IT Ops",
+    "metadata": {
+      "description": "The service Tag value for the company"
+    }
+  },
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+"variables": {
+  "resourcePrefix": "[parameters('resourcePrefix')]",
+  "storageName": "[concat(variables('resourcePrefix'),parameters('storageNamePrefix'))]"
+},
+  "resources": [
+  {
+    "name": "[variables('storageName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2016-01-01",
+    "sku": {
+      "name": "[parameters('storageSKU')]",
+      "tier": "[parameters('storageTier')]"
+    },
+    "kind": "Storage",
+    "location": "[resourceGroup().location]",
+    "tags": {
+      "Department": "[parameters('serviceTagDept')]",
+      "Owner": "[parameters('serviceTagDept')]",
+      "Cost Centre": "[parameters('serviceTagDept')]",
+      "Environment": "[parameters('serviceTagEnvironment')]",
+      "Data Profile": "[parameters('serviceTagDataProfile')]"
+      },
+    "properties": {
+      "encryption": {
+      "keySource": "Microsoft.Storage",
+      "services": {
+      "blob": {
+                "enabled": true
+              }
+                  }
+                    }
+                  },
+    "dependsOn": []
+  }
+],
+  "outputs": {
+    "deploystorageResult": {
+      "value": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('storageName')),providers('Microsoft.Storage', 'storageAccounts').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deploystorageIdResult": {
+      "value": "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageName'))]",
+      "type" : "string"
+    },
+    "deploystorageUriResult": {
+      "value": "[reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('storageName')), '2015-06-15').primaryEndpoints['blob']]",
+      "type": "string"
+    }
+  }
+}
+
+

@@ -1,0 +1,137 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appservicePlanNamePrefix": {
+            "defaultValue": "ae-app-standard-plan",
+            "type": "string"
+        },
+        "webappNamePrefix": {
+            "defaultValue": "aechwebappdevops",
+            "type": "string"
+        },
+        "webappLocation": {
+            "type": "string",
+            "allowedValues": [
+                "Australia East",
+                "Australia Southeast",
+                "Southeast Asia",
+                "East Asia",
+                "Japan East",
+                "Japan West",
+                "West Europe"
+                ],
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "numberOfWebAppCopy": {
+            "type": "int",
+            "defaultValue": 2
+        }
+    },
+
+    "variables": {},
+    "resources": [
+        {
+            "comments": "App Service Plan, change the vaule for your need in sku",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 2
+            },
+            "kind": "app",
+            "name": "[parameters('appservicePlanNamePrefix')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('webappLocation')]",
+            "properties": {
+                "name": "[parameters('appservicePlanNamePrefix')]",
+                "numberOfWorkers": 2
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Setting up the Auto Scaling for the WebApp Instance",
+            "type": "Microsoft.Insights/autoscaleSettings",
+            "name": "[parameters('appservicePlanNamePrefix')]",
+            "apiVersion": "2014-04-01",
+            "location": "eastasia",
+            "tags": {},
+            "properties": {
+                "profiles": [
+                    {
+                        "name": "Default",
+                        "capacity": {
+                            "minimum": "2",
+                            "maximum": "9",
+                            "default": "2"
+                        },
+                        "rules": [
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('appservicePlanNamePrefix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "GreaterThan",
+                                    "threshold": 60
+                                },
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT5M"
+                                }
+                            },
+                            {
+                                "metricTrigger": {
+                                    "metricName": "CpuPercentage",
+                                    "metricNamespace": "",
+                                    "metricResourceUri": "[resourceId('Microsoft.Web/serverfarms', parameters('appservicePlanNamePrefix'))]",
+                                    "timeGrain": "PT1M",
+                                    "statistic": "Average",
+                                    "timeWindow": "PT10M",
+                                    "timeAggregation": "Average",
+                                    "operator": "LessThan",
+                                    "threshold": 20
+                                },
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ChangeCount",
+                                    "value": "1",
+                                    "cooldown": "PT5M"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "enabled": true,
+                "name": "[parameters('appservicePlanNamePrefix')]",
+                "targetResourceUri": "[reference(resourceId('Microsoft.Web/serverfarms', parameters('appservicePlanNamePrefix')))]"
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Web App",
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[concat(parameters('webappNamePrefix'), copyIndex())]",
+            "location": "[parameters('webappLocation')]",
+            "tags": {
+            },
+            "copy": {
+                "name": "websitescopy",
+                "count": "[parameters('numberOfWebAppCopy')]"
+            },
+            "properties": {
+                "name": "[parameters('webappNamePrefix')]",
+                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', parameters('appservicePlanNamePrefix')))]"
+            },
+            "dependsOn": []
+        }
+    ]
+}

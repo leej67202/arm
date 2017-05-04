@@ -1,0 +1,89 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlDBKeyVaultName": {
+        "type": "string"
+      },
+        "sqlDBKeyVaultSecretName": {
+        "type": "string"
+      },
+        "keyVaultResourceGroupName": {
+        "type": "string"
+      },
+        "sqlServerAdminLogin": {
+        "type": "string"
+    },
+    "resourcePrefix": {
+      "type": "string",
+      "maxLength": 10,
+      "defaultValue": "prefix",
+      "metadata": {
+        "description": "Resource prefix"
+      }
+        },
+    "sqlServerNamePrefix": {
+        "type": "string",
+        "maxLength": 10,
+        "defaultValue": "sqlsev01",
+        "metadata": {
+        "description": "SQL DB name prefix"
+        }
+    },
+    "sqlDBNamePrefix": {
+        "type": "string",
+        "maxLength": 10,
+        "defaultValue": "sqldb01",
+        "metadata": {
+        "description": "SQL DB name prefix"
+        }
+    },
+    "sqlDBCollation": {
+        "type": "string",
+        "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+        }
+    },
+"variables": {
+  "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
+  "sqlServerDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'sqldb/deploysqldbserver.json')]"
+},
+    "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "name": "nestedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sqlServerDBTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+        "resourcePrefix": {
+              "value": "[parameters('resourcePrefix')]"
+              },
+        "sqlServerNamePrefix": {
+              "value": "[parameters('sqlServerNamePrefix')]"
+              },
+        "sqlDBNamePrefix": {
+              "value": "[parameters('sqlDBNamePrefix')]"
+              },
+        "sqlDBCollation": {
+              "value": "[parameters('sqlDBCollation')]"
+              },
+        "sqlServerAdminLogin": {
+              "value": "[parameters('sqlServerAdminLogin')]"
+              },
+        "sqlServerAdminPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[concat( subscription().id, '/resourceGroups/', parameters('keyVaultResourceGroupName'), '/providers/Microsoft.KeyVault/vaults/', parameters('sqlDBKeyVaultName'))]"
+              },
+              "secretName": "[parameters('sqlDBKeyVaultSecretName')]"
+            }
+          }
+        }
+      }
+    }],
+    "outputs": {}
+}

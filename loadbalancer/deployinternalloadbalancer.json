@@ -1,0 +1,126 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 15,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Internal load balancer prefix"
+                }
+            },
+            "internalLoadBalancerNamePrefix": {
+            "type": "string",
+            "maxLength": 20,
+            "defaultValue": "ilb01",
+            "metadata": {
+            "description": "Internal load balancer name prefix"
+                }
+            },
+            "internalLoadBalancerSubnetId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+            "description": "Internal load balancer subnet ID"
+                }
+            },
+            "privateIPAllocationMethod": {
+            "type": "string",
+            "allowedValues": [
+                "Static",
+                "Dynamic"
+            ],
+            "defaultValue": "Dynamic",
+            "metadata": {
+            "description": "IP Allocation method"
+                }
+            },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "internalLoadBalancerName": "[concat(variables('resourcePrefix'),parameters('internalLoadBalancerNamePrefix'))]"
+    },
+    "resources": [
+        {
+            "comments": "https://docs.microsoft.com/en-us/azure/templates/microsoft.network/loadbalancers",
+            "apiVersion": "2016-03-30",
+            "name": "[variables('internalLoadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "dependsOn": [],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
+                            "subnet": {
+                                "id": "[parameters('internalLoadBalancerSubnetId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+  "outputs": {
+    "deployavailabilitysetResult": {
+      "value": "[reference(concat('Microsoft.Network/loadBalancers/', variables('internalLoadBalancerName')),providers('Microsoft.Network', 'loadBalancers').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deployasIdResult": {
+      "value": "[resourceid('Microsoft.Network/loadBalancers/', variables('internalLoadBalancerName'))]",
+      "type" : "string"
+    }
+  }
+}

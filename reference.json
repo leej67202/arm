@@ -1,0 +1,113 @@
+Unique resource names
+
+You must provide a unique resource name for any resource type that has a data access endpoint. 
+Some common resource types that require a unique name include:
+Azure Storage
+Web Apps feature of Azure App Service
+SQL Server
+Azure Key Vault
+Azure Redis Cache
+Azure Batch
+Azure Traffic Manager
+Azure Search
+Azure HDInsight
+
+# Pass secure values during deployment - use KeyVaults
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-keyvault-parameter
+
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/best-practices-resource-manager-security
+
+
+# This location is based on your resourceGroup
+"location": "[resourceGroup().location]",
+
+"variables": {
+  "storageName": "[concat(parameters('storageNamePrefix'), uniqueString(resourceGroup().id))]"
+},
+
+# Linked template
+# https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-linked-templates
+"resources": [ 
+  { 
+      "apiVersion": "2015-01-01", 
+      "name": "linkedTemplate", 
+      "type": "Microsoft.Resources/deployments", 
+      "properties": { 
+        "mode": "incremental", 
+        "templateLink": {
+          "uri": "https://www.contoso.com/AzureTemplates/newStorageAccount.json",
+          "contentVersion": "1.0.0.0"
+        }, 
+        "parameters": { 
+          "StorageAccountName":{"value": "[parameters('StorageAccountName')]"} 
+        } 
+      } 
+  } 
+]
+
+# copy loop
+"resources": [ 
+  { 
+      "name": "[concat('examplecopy-', copyIndex())", 
+      "type": "Microsoft.Web/sites", 
+      "location": "East US", 
+      "apiVersion": "2015-08-01",
+      "copy": { 
+         "name": "websitescopy", 
+         "count": "[parameters('count')]" 
+      }, 
+      "properties": {
+          "serverFarmId": "hostingPlanName"
+      } 
+  } 
+]
+
+# Reference expressions implicitly declare that one resource depends on another. The general format is:
+reference('resourceName').propertyPath
+ "properties": {
+        "originHostHeader": "[reference(variables('webAppName')).hostNames[0]]",
+        ...
+    }
+
+
+# reference the resource from the output value (value)
+"networkSecurityGroup": {
+"id": "[reference('deployvnetTemplate').outputs.deployFENSGNameResult.value]"
+                }
+
+"subnet": {
+"id": "[concat(reference('deployvnetTemplate').outputs.deployvnetIdResult.value, reference('deployvnetTemplate').outputs.deployFESubnetIdResult.value)]"
+}
+
+# reference to the existing storage account for the bootDiagnostics
+ "diagnosticsProfile": {
+     "bootDiagnostics": {
+         "enabled": "true",
+         "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob]"
+     }
+ }
+
+# You also can reference an existing storage account that is in a different resource group:
+
+ "osDisk": {
+     "name": "osdisk", 
+     "vhd": {
+         "uri":"[concat(reference(resourceId(parameters('existingResourceGroup'), 'Microsoft.Storage/storageAccounts/', parameters('existingStorageAccountName')), '2016-01-01').primaryEndpoints.blob,  variables('vmStorageAccountContainerName'), '/', variables('OSDiskName'),'.vhd')]"
+     }
+ }
+
+# When you add a password to a custom script extension, use the commandToExecute property in the protectedSettings property:
+"properties": {
+     "publisher": "Microsoft.Azure.Extensions",
+     "type": "CustomScript",
+     "typeHandlerVersion": "2.0",
+     "autoUpgradeMinorVersion": true,
+     "settings": {
+         "fileUris": [
+             "[concat(variables('template').assets, '/lamp-app/install_lamp.sh')]"
+         ]
+     },
+     "protectedSettings": {
+         "commandToExecute": "[concat('sh install_lamp.sh ', parameters('mySqlPassword'))]"
+     }
+ }

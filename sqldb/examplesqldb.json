@@ -1,0 +1,88 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "server_name": {
+            "defaultValue": "sqlsev01",
+            "type": "string"
+        },
+        "admin_name": {
+            "defaultValue": "sqlsev01",
+            "type": "string"
+        },
+        "admin_password": {
+            "type": "securestring"
+        },
+        "database_name": {
+            "defaultValue": "sqldb01",
+            "type": "string"
+        },
+        "database_collation": {
+            "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+            "type": "string"
+        },
+        "firewallRules_AllowAllWindowsAzureIps_name": {
+            "defaultValue": "AllowAllWindowsAzureIps",
+            "type": "string"
+        }
+    },
+    "variables": {
+        "dbName": "[concat(parameters('server_name'), '/', parameters('database_name'))]",
+        "firewallRulesName": "[concat(parameters('server_name'), '/', parameters('firewallRules_AllowAllWindowsAzureIps_name'))]"
+    },
+    "resources": [
+        {
+            "comments": "",
+            "type": "Microsoft.Sql/servers",
+            "kind": "v12.0",
+            "name": "[parameters('server_name')]",
+            "apiVersion": "2014-04-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('admin_name')]",
+                "administratorLoginPassword": "[parameters('admin_password')]",
+                "version": "12.0"
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "creating database",
+            "type": "Microsoft.Sql/servers/databases",
+            "kind": "v12.0,system",
+            "name": "[variables('dbname')]",
+            "apiVersion": "2014-04-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "edition": "Standard",
+                "status": "Online",
+                "serviceLevelObjective": "S0",
+                "collation": "[parameters('database_collation')]",
+                "requestedServiceObjectiveName": "S0",
+                "sampleName": null,
+                "earliestRestoreDate": null,
+                "elasticPoolName": null,
+                "containmentState": 2,
+                "readScale": "Disabled",
+                "failoverGroupId": null
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]"
+            ]
+        },
+        {
+            "comments": "",
+            "type": "Microsoft.Sql/servers/firewallrules",
+            "kind": "v12.0",
+            "name": "[variables('firewallRulesName')]",
+            "apiVersion": "2014-04-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]"
+            ]
+        }
+    ]
+}
