@@ -216,9 +216,9 @@
                   },
               {
               "apiVersion": "2014-04-01-preview",
-                "type": "Microsoft.Sql/servers/firewallrules",
+                "type": "firewallrules",
                 "dependsOn": [
-                        "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+                        "[variables('sqlServerName')]"
                     ],
                 "location": "[resourceGroup().location]",
                 "name": "AllowAllWindowsAzureIps",
