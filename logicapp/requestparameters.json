@@ -2,10 +2,10 @@
  "$schema":  "http://json-schema.org/draft-04/schema",
  "properties": {
     "customerFirstName": {
-         "value": "John"
+         "value": "Peter"
      },
     "customerLastName": {
-         "value": "Hanken"
+         "value": "Pan"
      },
      "customerEmail": {
          "value": "email@outlook.com"
@@ -17,7 +17,7 @@
          "value": "98765432"
      },
     "customerAddress": {
-         "value": "1 Tokyo Road"
+         "value": "99 Tokyo Road"
      },
     "customerAddress1": {
          "value": "Japan"
