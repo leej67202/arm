@@ -10,30 +10,12 @@
             "description": "Resource prefix"
                 }
             },
-            "availabilitySetNamePrefix": {
+            "logicAppNamePrefix": {
             "type": "string",
             "maxLength": 60,
-            "defaultValue": "as01",
+            "defaultValue": "logicapp01",
             "metadata": {
-            "description": "Availability Set name prefix"
-                }
-            },
-            "availabilitySetUpdateDomainCount": {
-            "type": "int",
-            "maxValue": 20,
-            "minValue": 2,
-            "defaultValue": 5,
-            "metadata": {
-            "description": "Platform Update Domain Count"
-                }
-            },
-            "availabilitySetFaultDomainCount": {
-            "type": "int",
-            "maxValue": 3,
-            "minValue": 1,
-            "defaultValue": 2,
-            "metadata": {
-            "description": "Platform Fault Domain Count"
+            "description": "logic app prefix"
                 }
             },
 "serviceTagDept": {
@@ -81,17 +63,14 @@
 },
     "variables": {
         "resourcePrefix": "[parameters('resourcePrefix')]",
-        "availabilitySetName": "[concat(variables('resourcePrefix'),parameters('availabilitySetNamePrefix'))]"
+        "logicAppName": "[concat(variables('resourcePrefix'),parameters('logicAppNamePrefix'))]"
     },
     "resources": [
         {
-            "comments": "Rebuild",
-            "type": "Microsoft.Compute/availabilitySets",
-            "sku": {
-                "name": "Aligned"
-            },
-            "name": "[variables('availabilitySetName')]",
-            "apiVersion": "2016-04-30-preview",
+            "comments": "Create Logic App",
+            "type": "Microsoft.Logic/workflows",
+            "name": "[variables('logicAppName')]",
+            "apiVersion": "2016-06-01",
             "location": "[resourceGroup().location]",
             "tags": {
                 "Department": "[parameters('serviceTagDept')]",
@@ -101,20 +80,27 @@
                 "Data Profile": "[parameters('serviceTagDataProfile')]"
             },
             "properties": {
-                "platformUpdateDomainCount": "[int(parameters('availabilitySetUpdateDomainCount'))]",
-                "platformFaultDomainCount": "[int(parameters('availabilitySetFaultDomainCount'))]",
-                "virtualMachines": []
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "triggers": {},
+                    "actions": {},
+                    "outputs": {}
+                },
+                "parameters": {}
             },
             "dependsOn": []
         }
     ],
   "outputs": {
-    "deployavailabilitysetResult": {
-      "value": "[reference(concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName')),providers('Microsoft.Compute', 'availabilitySets').apiVersions[0])]",
+    "deployLogicAppResult": {
+      "value": "[reference(concat('Microsoft.Logic/workflows/', variables('logicAppName')),providers('Microsoft.Logic', 'workflows').apiVersions[0])]",
       "type" : "object"
     },
-    "deployasIdResult": {
-      "value": "[resourceid('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+    "deployLogicAppIdResult": {
+      "value": "[resourceid('Microsoft.Logic/workflows/', variables('logicAppName'))]",
       "type" : "string"
     }
   }
