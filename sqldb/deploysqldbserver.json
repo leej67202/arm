@@ -201,7 +201,7 @@
                         {
                         "comments": "Transparent Data Encryption",
                         "name": "TDE",
-                        "type": "transparentDataEncryption",
+                        "type": "sqlDBTransparentDataEncryption",
                         "apiVersion": "2014-04-01-preview",
                         "properties": {
                         "status": "[parameters('sqlDBTransparentDataEncryption')]"
