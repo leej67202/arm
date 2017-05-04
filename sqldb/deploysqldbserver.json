@@ -237,7 +237,7 @@
         }
     ],
   "outputs": {
-    "deployDiskResult": {
+    "deploySQLServerObjectResult": {
       "value": "[reference(concat('Microsoft.Sql/servers/', variables('sqlServerName')),providers('Microsoft.Sql', 'servers').apiVersions[0])]",
       "type" : "object"
     },
@@ -250,7 +250,7 @@
       "type" : "string"
     },
     "deploySQLDBIdResult": {
-      "value": "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlDBName'))]",
+      "value": "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlServerName'), variables('sqlDBName'))]",
       "type" : "string"
     }
   }
