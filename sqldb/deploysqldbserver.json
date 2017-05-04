@@ -207,7 +207,7 @@
                         "status": "[parameters('sqlDBTransparentDataEncryption')]"
                         },
                     "dependsOn": [
-                        "[resourceId('Microsoft.Sql/servers/databases/', variables('sqlDBName'))]"
+                        "[concat('Microsoft.Sql/servers/databases/', variables('sqlDBName'))]"
                                 ]   
                         }
                                 ]
