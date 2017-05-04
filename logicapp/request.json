@@ -1,0 +1,29 @@
+{
+ "$schema":  "http://json-schema.org/draft-04/schema",
+ "properties": {
+    "customerFirstName": {
+         "type": "string"
+     },
+    "customerLastName": {
+         "type": "string"
+     },
+     "customerEmail": {
+         "type": "string"
+     },
+    "customerMobileNumber": {
+         "type": "string"
+     },
+    "customerHomePhoneNumber": {
+         "type": "string"
+     },
+    "customerAddress": {
+         "type": "string"
+     },
+    "customerAddress1": {
+         "type": "string"
+     },
+    "customerId": {
+         "type": "string"
+     }
+ }   
+}
