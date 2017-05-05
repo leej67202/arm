@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namespaces_cccheh01_name": {
+            "defaultValue": "cccheh01",
+            "type": "String"
+        },
+        "AuthorizationRules_RootManageSharedAccessKey_name": {
+            "defaultValue": "cccheh01/RootManageSharedAccessKey",
+            "type": "String"
+        },
+        "eventhubs_event1_name": {
+            "defaultValue": "cccheh01/event1",
+            "type": "String"
+        },
+        "consumergroups_$Default_name": {
+            "defaultValue": "cccheh01/event1/$Default",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "",
+            "type": "Microsoft.EventHub/namespaces",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+            },
+            "kind": "EventHub",
+            "name": "[parameters('namespaces_cccheh01_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "Canada Central",
+            "tags": {},
+            "properties": {
+                "provisioningState": "Succeeded",
+                "status": "Active",
+                "createdAt": "2017-05-05T13:44:43.573Z",
+                "serviceBusEndpoint": "[concat('https://', parameters('namespaces_cccheh01_name'),'.servicebus.windows.net:443/')]",
+                "enabled": true,
+                "updatedAt": "2017-05-05T13:45:06.253Z"
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "",
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "name": "[parameters('AuthorizationRules_RootManageSharedAccessKey_name')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_cccheh01_name'))]"
+            ]
+        },
+        {
+            "comments": "",
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "name": "[parameters('eventhubs_event1_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "Canada Central",
+            "properties": {
+                "messageRetentionInDays": 1,
+                "status": "Active",
+                "createdAt": "2017-05-05T13:46:01.077",
+                "updatedAt": "2017-05-05T13:46:04.313",
+                "partitionCount": 2,
+                "partitionIds": [
+                    "0",
+                    "1"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_cccheh01_name'))]"
+            ]
+        },
+        {
+            "comments": "",
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "name": "[parameters('consumergroups_$Default_name')]",
+            "apiVersion": "2015-08-01",
+            "location": "Canada Central",
+            "properties": {
+                "createdAt": "2017-05-05T13:46:02.1649056",
+                "updatedAt": "2017-05-05T13:46:02.1649056"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_cccheh01_name'))]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventhubs_event1_name'))]"
+            ]
+        }
+    ]
+}

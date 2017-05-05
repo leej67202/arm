@@ -1,0 +1,205 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 60,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Resource prefix"
+                }
+            },
+        "eventHubNamespacePrefix": {
+            "type": "string",
+            "maxLength": 60,
+            "defaultValue": "eh01",
+            "metadata": {
+            "description": "Event Hub namespace prefix format ******.servicebus.windows.net"
+                }
+            },
+        "eventHubSkuTier": {
+            "type": "string",
+            "allowedValues": [
+                "Basic",
+                "Standard",
+                "Premium"
+                ],
+        "defaultValue": "Basic",
+        "metadata": {
+            "description": "SKU Tier"
+            }
+        },
+        "eventHubSkuTierName": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "metadata": {
+            "description": "The name of the above SKU Tier"
+            }
+        },
+        "authorizationRulesName": {
+            "defaultValue": "RootManageSharedAccessKey",
+            "type": "string"
+        },
+        "eventName": {
+            "defaultValue": "event1",
+            "type": "string"
+        },
+        "consumergroupsName": {
+            "defaultValue": "group1",
+            "type": "string"
+        },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "apiVersion": "2015-08-01",
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "eventHubNamespace": "[concat(variables('resourcePrefix'),parameters('eventHubNamespacePrefix'))]",
+        "authorizationRulesName": "[parameters('authorizationRulesName')]",
+        "eventName": "[parameters('eventName')]",
+        "consumergroupsName": "[parameters('consumergroupsName')]",
+        "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
+        "authRuleResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('authorizationRulesName'))]"
+   },
+    "resources": [
+        {
+            "comments": "",
+            "type": "Microsoft.EventHub/namespaces",
+            "sku": {
+                "name": "[parameters('eventHubSkuTierName')]",
+                "tier": "[parameters('eventHubSkuTier')]"
+            },
+            "kind": "EventHub",
+            "name": "[variables('eventHubNamespace')]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "properties": {
+                "serviceBusEndpoint": "[variables('eventHubEndpoint')]",
+                "enabled": true
+            },
+            "dependsOn": [],
+
+            "resources": [
+                        {
+            "comments": "",
+            "type": "eventhubs",
+            "name": "[parameters('eventName')]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "properties": {},
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
+                ],
+
+                "resources": [
+                            {
+                    "comments": "",
+                    "type": "consumergroups",
+                    "name": "[variables('consumergroupsName')]",
+                    "apiVersion": "2015-08-01",
+                    "location": "[resourceGroup().location]",
+                    "properties": {},
+                    "dependsOn": [
+                        "[parameters('eventName')]"
+                        ]
+                            }
+                    ]
+                }
+            ]
+        },
+        {
+            "comments": "Create the authoriazrion rule key",
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "name": "[variables('authorizationRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+            ]
+        }
+    ],
+  "outputs": {
+    "deployEventHubResult": {
+        "value": "[reference(concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace')),providers('Microsoft.EventHub', 'namespaces').apiVersions[0])]",
+        "type" : "object"
+    },
+    "deployEventHubIdResult": {
+        "value": "[resourceid('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]",
+        "type" : "string"
+    },
+    "deployEventHubFQDN": {
+        "value": "[reference(concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))).fullyQualifiedDomainName]",
+        "type" : "string"
+    },
+    "deployEventIdResult": {
+        "value": "[resourceid('Microsoft.EventHub/namespaces/eventhubs/', variables('eventName'))]",
+        "type" : "string"
+    },
+    "deployEventHubEndpointResult": {
+        "value": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
+        "type": "string"
+    },
+    "connectionStringResult": {
+        "value":"[listkeys(variables('authRuleResourceId'), variables('apiVersion')).primaryConnectionString]",
+        "type": "string"
+    },
+    "sharedAccessPolicyPrimaryKeyResult": {
+        "value":"[listkeys(variables('authRuleResourceId'), variables('apiVersion')).primaryKey]",
+        "type": "string"
+    }
+  }
+}
