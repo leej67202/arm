@@ -38,15 +38,15 @@
             }
         },
         "authorizationManageRulesName": {
-            "defaultValue": "RootManageSharedAccessKey",
+            "defaultValue": "EventManageSharedAccessKey",
             "type": "string"
         },
         "authorizationListenRulesName": {
-            "defaultValue": "RootListenSharedAccessKey",
+            "defaultValue": "EventListenSharedAccessKey",
             "type": "string"
         },
         "authorizationSendRulesName": {
-            "defaultValue": "RootSendSharedAccessKey",
+            "defaultValue": "EventSendSharedAccessKey",
             "type": "string"
         },
         "eventName": {
@@ -108,7 +108,7 @@
         "eventName": "[parameters('eventName')]",
         "consumergroupsName": "[parameters('consumergroupsName')]",
         "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
-        "authRuleManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
+        "authRuleEventManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
    },
     "resources": [
         {
@@ -139,7 +139,7 @@
             {
             "comments": "create an event",
             "type": "eventhubs",
-            "name": "[parameters('eventName')]",
+            "name": "[variables('eventName')]",
             "apiVersion": "2015-08-01",
             "location": "[resourceGroup().location]",
             "properties": {},
@@ -156,7 +156,7 @@
                     "location": "[resourceGroup().location]",
                     "properties": {},
                     "dependsOn": [
-                        "[parameters('eventName')]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
                         ]
                             },
                     {
@@ -172,7 +172,8 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
                     ]
                     },
                     {
@@ -186,7 +187,8 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
                         ]
                     },
                     {
@@ -200,7 +202,8 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
                     ]
                     }
                     ]
@@ -229,13 +232,18 @@
         "value": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
         "type": "string"
     },
-    "connectionStringResult": {
-        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryConnectionString]",
+    "eventConnectionStringResult": {
+        "value":"[listkeys(variables('authRuleEventManageResourceId'), variables('apiVersion')).primaryConnectionString]",
         "type": "string"
     },
-    "sharedAccessPolicyPrimaryKeyResult": {
-        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryKey]",
+    "eventSharedAccessPolicyPrimaryKeyResult": {
+        "value":"[listkeys(variables('authRuleEventManageResourceId'), variables('apiVersion')).primaryKey]",
         "type": "string"
     }
   }
 }
+
+
+"[concat('Microsoft.EventHub/namespaces/', parameters('namespaceName'),'/eventhubs/',parameters('eventHubName'))]",
+
+"[concat('Microsoft.EventHub/namespaces/', parameters('namespaceName'),'/eventhubs/',parameters('eventHubName'), '/consumerGroups/', parameters('consumerGroupName'))]"
