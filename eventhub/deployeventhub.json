@@ -172,7 +172,8 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
                     ]
                     },
                     {
@@ -186,7 +187,9 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/authorizationRules/', parameters('eventAuthorizationManageRulesName'))]"
                         ]
                     },
                     {
@@ -200,7 +203,10 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/authorizationRules/', parameters('eventAuthorizationManageRulesName'))]",
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/authorizationRules/', parameters('eventAuthorizationListenRulesName'))]"
                     ]
                     }
                     ]
@@ -239,3 +245,5 @@
     }
   }
 }
+
+
