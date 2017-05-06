@@ -1,0 +1,209 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 10,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Resource prefix"
+                }
+            },
+        "serviceBusNamespacePrefix": {
+            "type": "string",
+            "maxLength": 10,
+            "defaultValue": "sb01",
+            "metadata": {
+            "description": "Event Hub namespace prefix format ******.servicebus.windows.net"
+                }
+            },
+        "serviceBusSkuTier": {
+            "type": "string",
+            "allowedValues": [
+                "Basic",
+                "Standard",
+                "Premium"
+                ],
+        "defaultValue": "Basic",
+        "metadata": {
+            "description": "SKU Tier"
+            }
+        },
+        "serviceBusSkuTierName": {
+            "type": "string",
+            "defaultValue": "Basic",
+            "metadata": {
+            "description": "The name of the above SKU Tier"
+            }
+        },
+        "serviceBusAuthorizationManageRulesName": {
+            "defaultValue": "RootManageSharedAccessKey",
+            "type": "string"
+        },
+        "serviceBusAuthorizationListenRulesName": {
+            "defaultValue": "RootListenSharedAccessKey",
+            "type": "string"
+        },
+        "serviceBusAuthorizationSendRulesName": {
+            "defaultValue": "RootSendSharedAccessKey",
+            "type": "string"
+        },
+        "queueName": {
+            "defaultValue": "queue1",
+            "type": "string"
+        },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "apiVersion": "2015-08-01",
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "serviceBusNamespace": "[concat(variables('resourcePrefix'),parameters('serviceBusNamespacePrefix'), uniqueString(resourceGroup().id))]",
+        "serviceBusAuthorizationManageRulesName": "[parameters('serviceBusAuthorizationManageRulesName')]",
+        "queueName": "[concat(variables('serviceBusNamespace'), parameters('queueName'))]",
+        "serviceBusEndpoint": "[concat('https://', variables('serviceBusNamespace'),'.servicebus.windows.net:443/')]",
+        "authRuleManageResourceId":"[resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', variables('serviceBusNamespace'), variables('serviceBusAuthorizationManageRulesName'))]"
+   },
+    "resources": [
+        {
+            "comments": "Creating a bus namespace",
+            "type": "Microsoft.ServiceBus/namespaces",
+            "sku": {
+                "name": "[parameters('serviceBusSkuTierName')]",
+                "tier": "[parameters('serviceBusSkuTier')]"
+            },
+            "kind": "EventHub",
+            "name": "[variables('serviceBusNamespace')]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "properties": {
+                "serviceBusEndpoint": "[variables('serviceBusEndpoint')]",
+                "enabled": true
+            },
+            "dependsOn": [],
+              "resources": [
+                  {
+                "name": "[parameters('serviceBusAuthorizationListenRulesName')]",
+                "type": "AuthorizationRules",
+                "apiVersion": "2015-08-01",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                "rights": [
+                    "Listen"
+                    ]
+                    },
+                "dependsOn": [
+                   "[concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'))]" 
+                ]
+                },
+                 {
+                "name": "[parameters('serviceBusAuthorizationSendRulesName')]",
+                "type": "AuthorizationRules",
+                "apiVersion": "2015-08-01",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                "rights": [
+                    "Send"
+                    ]
+                    },
+                "dependsOn": [
+                   "[concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'))]",
+                   "[concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'), '/AuthoriaztionRules/', parameters('serviceBusAuthorizationListenRulesName'))]"
+                    ]
+                },
+                {
+                "name": "[variables('queueName')]",
+                "type": "queues",
+                "apiVersion": "2015-08-01",
+                "location": "[resourceGroup().location]",
+                    "properties": {
+                        "supportOrdering": true
+                    },
+                "dependsOn": [
+                   "[concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'))]"
+                    ],
+                    "resources": [
+                        ]
+                }
+            ]
+        }
+    ],
+  "outputs": {
+    "deployServiceBusResult": {
+        "value": "[reference(concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace')),providers('Microsoft.EventHub', 'namespaces').apiVersions[0])]",
+        "type" : "object"
+    },
+    "deployServiceBusIdResult": {
+        "value": "[resourceid('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'))]",
+        "type" : "string"
+    },
+    "deployServiceBusFQDN": {
+        "value": "[reference(concat('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'))).serviceBusEndpoint]",
+        "type" : "string"
+    },
+    "deployServiceBusEndpointResult": {
+        "value": "[concat('https://', variables('serviceBusNamespace'),'.servicebus.windows.net:443/')]",
+        "type": "string"
+    },
+    "deployServiceQueueBusIdResult": {
+        "value": "[resourceid('Microsoft.ServiceBus/namespaces/', variables('serviceBusNamespace'), variables('queueName'))]",
+        "type" : "string"
+    },
+    "serviceBusConnectionStringResult": {
+        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryConnectionString]",
+        "type": "string"
+    },
+    "serviceBusSharedAccessPolicyPrimaryKeyResult": {
+        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryKey]",
+        "type": "string"
+    }
+  }
+}
