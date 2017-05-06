@@ -228,7 +228,7 @@
         "type" : "string"
     },
     "deployEventIdResult": {
-        "value": "[resourceid('Microsoft.EventHub/namespaces/eventhubs/', variables('eventName'))]",
+        "value": "[resourceid('Microsoft.EventHub/namespaces/eventhubs/', variables('eventHubNamespace'), variables('eventName'))]",
         "type" : "string"
     },
     "deployEventHubEndpointResult": {
