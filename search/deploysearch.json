@@ -21,13 +21,13 @@
         "searchSkuTier": {
             "type": "string",
             "allowedValues": [
-                "Free",
-                "Basic",
-                "Standard",
-                "Standard2",
-                "Standard3"
+                "free",
+                "basic",
+                "standard",
+                "standard2",
+                "standard3"
                 ],
-        "defaultValue": "Free",
+        "defaultValue": "free",
         "metadata": {
             "description": "SKU Tier"
             }
@@ -81,7 +81,7 @@
    },
     "resources": [
             {
-            "name": "string",
+            "name": "[variables('searchNamespace')]",
             "type": "Microsoft.Search/searchServices",
             "apiVersion": "2015-08-19",
             "location": "[resourceGroup().location]",
@@ -99,15 +99,15 @@
             }
     ],
   "outputs": {
-    "deployServiceBusResult": {
+    "deploySearchResult": {
         "value": "[reference(concat('Microsoft.Search/searchServices/', variables('searchNamespace')),providers('Microsoft.Search', 'searchServices').apiVersions[0])]",
         "type" : "object"
         },
-    "deployServiceBusIdResult": {
+    "deploySearchIdResult": {
         "value": "[resourceid('Microsoft.Search/searchServices/', variables('searchNamespace'))]",
         "type" : "string"
         },
-    "deployServiceBusEndpointResult": {
+    "deploySearchEndpointResult": {
         "value": "[concat('https://', variables('searchNamespace'),'.search.windows.net:443/')]",
         "type": "string"
         }
