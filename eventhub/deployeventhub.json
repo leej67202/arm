@@ -37,15 +37,15 @@
             "description": "The name of the above SKU Tier"
             }
         },
-        "authorizationManageRulesName": {
+        "eventAuthorizationManageRulesName": {
             "defaultValue": "EventManageSharedAccessKey",
             "type": "string"
         },
-        "authorizationListenRulesName": {
+        "eventAuthorizationListenRulesName": {
             "defaultValue": "EventListenSharedAccessKey",
             "type": "string"
         },
-        "authorizationSendRulesName": {
+        "eventAuthorizationSendRulesName": {
             "defaultValue": "EventSendSharedAccessKey",
             "type": "string"
         },
@@ -54,7 +54,7 @@
             "type": "string"
         },
         "consumergroupsName": {
-            "defaultValue": "$Default",
+            "defaultValue": "$Group1",
             "type": "string"
         },
 "serviceTagDept": {
@@ -103,12 +103,12 @@
     "variables": {
         "apiVersion": "2015-08-01",
         "resourcePrefix": "[parameters('resourcePrefix')]",
-        "eventHubNamespace": "[concat(variables('resourcePrefix'),parameters('eventHubNamespacePrefix'))]",
-        "authorizationManageRulesName": "[parameters('authorizationManageRulesName')]",
+        "eventHubNamespace": "[concat(variables('resourcePrefix'),parameters('eventHubNamespacePrefix'), uniqueString(resourceGroup().id))]",
+        "eventAuthorizationManageRulesName": "[parameters('eventAuthorizationManageRulesName')]",
         "eventName": "[parameters('eventName')]",
         "consumergroupsName": "[parameters('consumergroupsName')]",
         "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
-        "authRuleEventManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
+        "authRuleEventManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('eventName'), variables('eventAuthorizationManageRulesName'))]"
    },
     "resources": [
         {
@@ -149,7 +149,7 @@
 
                 "resources": [
                             {
-                    "comments": "create a consumergroup for the above event",
+                    "comments": "create a consumergroup for the above event if the Tier is standard",
                     "type": "consumergroups",
                     "name": "[variables('consumergroupsName')]",
                     "apiVersion": "2015-08-01",
@@ -162,7 +162,7 @@
                     {
                     "comments": "Create the authoriazrion Manage rule key",
                     "type": "authorizationRules",
-                    "name": "[parameters('authorizationManageRulesName')]",
+                    "name": "[parameters('eventAuthorizationManageRulesName')]",
                     "apiVersion": "2015-08-01",
                     "properties": {
                         "rights": [
@@ -173,13 +173,13 @@
                     },
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
                     ]
                     },
                     {
                     "comments": "Create the authoriazrion rule Listen key",
                     "type": "authorizationRules",
-                    "name": "[parameters('authorizationListenRulesName')]",
+                    "name": "[parameters('eventAuthorizationListenRulesName')]",
                     "apiVersion": "2015-08-01",
                     "properties": {
                         "rights": [
@@ -188,13 +188,13 @@
                     },
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
+                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
                         ]
                     },
                     {
                     "comments": "Create the authoriazrion rule send key",
                     "type": "authorizationRules",
-                    "name": "[parameters('authorizationSendRulesName')]",
+                    "name": "[parameters('eventAuthorizationSendRulesName')]",
                     "apiVersion": "2015-08-01",
                     "properties": {
                         "rights": [
@@ -203,7 +203,7 @@
                     },
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                        "[concat('Microsoft.EventHub/namespaces/', parameters('eventName'),'/eventhubs/',parameters('eventName'), '/consumerGroups/', parameters('consumergroupsName'))]"
+                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
                     ]
                     }
                     ]
@@ -242,8 +242,3 @@
     }
   }
 }
-
-
-"[concat('Microsoft.EventHub/namespaces/', parameters('namespaceName'),'/eventhubs/',parameters('eventHubName'))]",
-
-"[concat('Microsoft.EventHub/namespaces/', parameters('namespaceName'),'/eventhubs/',parameters('eventHubName'), '/consumerGroups/', parameters('consumerGroupName'))]"
