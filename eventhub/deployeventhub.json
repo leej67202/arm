@@ -108,7 +108,7 @@
         "eventName": "[parameters('eventName')]",
         "consumergroupsName": "[parameters('consumergroupsName')]",
         "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
-        "authRuleManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
+        "authRuleManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
    },
     "resources": [
         {
@@ -137,51 +137,7 @@
 
             "resources": [
             {
-            "comments": "Create the authoriazrion Manage rule key",
-            "type": "AuthorizationRules",
-            "name": "[variables('authorizationManageRulesName')]",
-            "apiVersion": "2015-08-01",
-            "properties": {
-                "rights": [
-                    "Listen",
-                    "Manage",
-                    "Send"
-                ]
-            },
-            "dependsOn": [
-                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
-                ]
-            },
-            {
-            "comments": "Create the authoriazrion rule Listen key",
-            "type": "AuthorizationRules",
-            "name": "[parameters('authorizationListenRulesName')]",
-            "apiVersion": "2015-08-01",
-            "properties": {
-                "rights": [
-                    "Listen"
-                ]
-            },
-            "dependsOn": [
-                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
-                ]
-            },
-            {
-            "comments": "Create the authoriazrion rule send key",
-            "type": "AuthorizationRules",
-            "name": "[parameters('authorizationSendRulesName')]",
-            "apiVersion": "2015-08-01",
-            "properties": {
-                "rights": [
-                    "Send"
-                ]
-            },
-            "dependsOn": [
-                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
-                ]
-            },
-                        {
-            "comments": "create am event",
+            "comments": "create an event",
             "type": "eventhubs",
             "name": "[parameters('eventName')]",
             "apiVersion": "2015-08-01",
@@ -202,7 +158,51 @@
                     "dependsOn": [
                         "[parameters('eventName')]"
                         ]
-                            }
+                            },
+                {
+            "comments": "Create the authoriazrion Manage rule key",
+            "type": "authorizationRules",
+            "name": "[parameters('authorizationManageRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            },
+            {
+            "comments": "Create the authoriazrion rule Listen key",
+            "type": "authorizationRules",
+            "name": "[parameters('authorizationListenRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            },
+            {
+            "comments": "Create the authoriazrion rule send key",
+            "type": "authorizationRules",
+            "name": "[parameters('authorizationSendRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            }
                     ]
                 }
             ]
