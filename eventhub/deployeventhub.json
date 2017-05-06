@@ -25,14 +25,14 @@
                 "Standard",
                 "Premium"
                 ],
-        "defaultValue": "Basic",
+        "defaultValue": "Standard",
         "metadata": {
             "description": "SKU Tier"
             }
         },
         "eventHubSkuTierName": {
             "type": "string",
-            "defaultValue": "Basic",
+            "defaultValue": "Standard",
             "metadata": {
             "description": "The name of the above SKU Tier"
             }
@@ -54,7 +54,7 @@
             "type": "string"
         },
         "consumergroupsName": {
-            "defaultValue": "$Group1",
+            "defaultValue": "Group1",
             "type": "string"
         },
 "serviceTagDept": {
@@ -108,7 +108,7 @@
         "eventName": "[parameters('eventName')]",
         "consumergroupsName": "[parameters('consumergroupsName')]",
         "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
-        "authRuleEventManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules/', variables('eventHubNamespace'), variables('eventName'), variables('eventAuthorizationManageRulesName'))]"
+        "authRuleEventManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('eventHubNamespace'), variables('eventName'), variables('eventAuthorizationManageRulesName'))]"
    },
     "resources": [
         {
@@ -172,8 +172,7 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
                     ]
                     },
                     {
@@ -187,8 +186,7 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
                         ]
                     },
                     {
@@ -202,8 +200,7 @@
                         ]
                     },
                     "dependsOn": [
-                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]",
-                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'), '/consumergroups/', variables('consumergroupsName'))]"
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventName'))]"
                     ]
                     }
                     ]
@@ -221,7 +218,7 @@
         "type" : "string"
     },
     "deployEventHubFQDN": {
-        "value": "[reference(concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))).fullyQualifiedDomainName]",
+        "value": "[reference(concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))).serviceBusEndpoint]",
         "type" : "string"
     },
     "deployEventIdResult": {
