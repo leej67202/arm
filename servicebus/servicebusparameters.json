@@ -1,0 +1,36 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourcePrefix": {
+      "value": "prefix"
+    },
+    "serviceBusNamespacePrefix": {
+      "value": "sb01"
+    },
+    "serviceBusSkuTier": {
+      "value": "Basic"
+    },
+    "serviceBusSkuTierName": {
+      "value": "Basic"
+    },
+    "serviceBusAuthorizationListenRulesName": {
+      "value": "RootListenSharedAccessKey"
+    },
+    "serviceBusAuthorizationSendRulesName": {
+      "value": "RootSendSharedAccessKey"
+    },
+    "queueName": {
+      "value": "queue1"
+    },
+    "serviceTagDept": {
+      "value": "IT Ops"
+    },
+    "serviceTagEnvironment": {
+      "value": "Staging"
+    },
+    "serviceTagDataProfile": {
+      "value": "Internal"
+    }
+  }
+}

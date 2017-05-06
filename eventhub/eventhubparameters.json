@@ -5,6 +5,30 @@
     "resourcePrefix": {
       "value": "prefix"
     },
+    "eventHubNamespacePrefix": {
+      "value": "eh01"
+    },
+    "eventHubSkuTier": {
+      "value": "Standard"
+    },
+    "eventHubSkuTierName": {
+      "value": "Standard"
+    },
+    "eventAuthorizationManageRulesName": {
+      "value": "EventManageSharedAccessKey"
+    },
+    "eventAuthorizationListenRulesName": {
+      "value": "EventListenSharedAccessKey"
+    },
+    "eventAuthorizationSendRulesName": {
+      "value": "EventSendSharedAccessKey"
+    },
+    "eventName": {
+      "value": "event1"
+    },
+    "consumergroupsName": {
+      "value": "Group1"
+    },
     "serviceTagDept": {
       "value": "IT Ops"
     },
