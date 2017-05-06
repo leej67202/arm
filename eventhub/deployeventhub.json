@@ -37,8 +37,16 @@
             "description": "The name of the above SKU Tier"
             }
         },
-        "authorizationRulesName": {
+        "authorizationManageRulesName": {
             "defaultValue": "RootManageSharedAccessKey",
+            "type": "string"
+        },
+        "authorizationListenRulesName": {
+            "defaultValue": "RootListenSharedAccessKey",
+            "type": "string"
+        },
+        "authorizationSendRulesName": {
+            "defaultValue": "RootSendSharedAccessKey",
             "type": "string"
         },
         "eventName": {
@@ -46,7 +54,7 @@
             "type": "string"
         },
         "consumergroupsName": {
-            "defaultValue": "group1",
+            "defaultValue": "$Default",
             "type": "string"
         },
 "serviceTagDept": {
@@ -96,11 +104,11 @@
         "apiVersion": "2015-08-01",
         "resourcePrefix": "[parameters('resourcePrefix')]",
         "eventHubNamespace": "[concat(variables('resourcePrefix'),parameters('eventHubNamespacePrefix'))]",
-        "authorizationRulesName": "[parameters('authorizationRulesName')]",
+        "authorizationManageRulesName": "[parameters('authorizationManageRulesName')]",
         "eventName": "[parameters('eventName')]",
         "consumergroupsName": "[parameters('consumergroupsName')]",
         "eventHubEndpoint": "[concat('https://', variables('eventHubNamespace'),'.servicebus.windows.net:443/')]",
-        "authRuleResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('authorizationRulesName'))]"
+        "authRuleManageResourceId":"[resourceId('Microsoft.EventHub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('authorizationManageRulesName'))]"
    },
     "resources": [
         {
@@ -128,8 +136,52 @@
             "dependsOn": [],
 
             "resources": [
+            {
+            "comments": "Create the authoriazrion Manage rule key",
+            "type": "AuthorizationRules",
+            "name": "[variables('authorizationManageRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            },
+            {
+            "comments": "Create the authoriazrion rule Listen key",
+            "type": "AuthorizationRules",
+            "name": "[parameters('authorizationListenRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Listen"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            },
+            {
+            "comments": "Create the authoriazrion rule send key",
+            "type": "AuthorizationRules",
+            "name": "[parameters('authorizationSendRulesName')]",
+            "apiVersion": "2015-08-01",
+            "properties": {
+                "rights": [
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[concat('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
+                ]
+            },
                         {
-            "comments": "",
+            "comments": "create am event",
             "type": "eventhubs",
             "name": "[parameters('eventName')]",
             "apiVersion": "2015-08-01",
@@ -141,7 +193,7 @@
 
                 "resources": [
                             {
-                    "comments": "",
+                    "comments": "create a consumergroup for the above event",
                     "type": "consumergroups",
                     "name": "[variables('consumergroupsName')]",
                     "apiVersion": "2015-08-01",
@@ -153,22 +205,6 @@
                             }
                     ]
                 }
-            ]
-        },
-        {
-            "comments": "Create the authoriazrion rule key",
-            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
-            "name": "[variables('authorizationRulesName')]",
-            "apiVersion": "2015-08-01",
-            "properties": {
-                "rights": [
-                    "Listen",
-                    "Manage",
-                    "Send"
-                ]
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubNamespace'))]"
             ]
         }
     ],
@@ -194,11 +230,11 @@
         "type": "string"
     },
     "connectionStringResult": {
-        "value":"[listkeys(variables('authRuleResourceId'), variables('apiVersion')).primaryConnectionString]",
+        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryConnectionString]",
         "type": "string"
     },
     "sharedAccessPolicyPrimaryKeyResult": {
-        "value":"[listkeys(variables('authRuleResourceId'), variables('apiVersion')).primaryKey]",
+        "value":"[listkeys(variables('authRuleManageResourceId'), variables('apiVersion')).primaryKey]",
         "type": "string"
     }
   }
