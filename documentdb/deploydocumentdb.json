@@ -113,7 +113,7 @@
     },
     "deploydoucmentDBPrimaryKeyResoult": {
       "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('dDBAccountName')), '2015-04-08').primaryMasterKey]",
-      "type": "securestring"
+      "type": "string"
     }
   }
 }

@@ -72,10 +72,10 @@
                 "value": "[parameters('numberOfWebAppCopy')]"
               },
               "documentDBEndpoint":{
-                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult]"
+                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult.value]"
               },
               "documentDBPrimaryKey":{
-                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydoucmentDBPrimaryKeyResoult]"
+                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydoucmentDBPrimaryKeyResoult.value]"
               }
             }
             }
@@ -84,7 +84,7 @@
   "outputs": {
     "deploydocumentDBEndpointResult": {
       "type": "string",
-      "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult]"
+      "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult.value]"
     },
     "deployWebAppResult": {
       "type": "object",
