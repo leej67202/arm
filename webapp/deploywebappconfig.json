@@ -27,8 +27,8 @@
         "type": "string"
         },
     "documentDBPrimaryKey": {
-        "defaultValue": "",
-        "type": "securestring"
+        "defaultValue": "primarykey",
+        "type": "string"
         },
     "serviceTagDept": {
       "type": "string",
@@ -130,12 +130,12 @@
                 "siteConfig": {
 				    "phpVersion": "off",
 				        "appSettings": [{
-					        "Name": "DOCUMENTDB_ENDPOINT",
-					        "Value": "[parameters('documentDBEndpoint')]"
+					        "name": "DOCUMENTDB_ENDPOINT",
+					        "value": "[parameters('documentDBEndpoint')]"
 				            },              
                             {
-					        "Name": "DOCUMENTDB_PRIMARY_KEY",
-					        "Value": "[parameters('documentDBPrimaryKey')]"
+					        "name": "DOCUMENTDB_PRIMARY_KEY",
+					        "value": "[parameters('documentDBPrimaryKey')]"
 				            }
                     ]
 			    }
