@@ -5,7 +5,7 @@
         "resourcePrefix": {
         "type": "string",
         "maxLength": 60,
-        "defaultValue": "ksch",
+        "defaultValue": "prefix",
         "metadata": {
         "description": "resource prefix"
       }

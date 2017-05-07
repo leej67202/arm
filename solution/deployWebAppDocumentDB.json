@@ -1,0 +1,57 @@
+
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+"parameters": {},
+"variables": {
+  "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
+  "documentDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
+  "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]",
+  "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
+  "webappParametersUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]"
+},
+"resources": [
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deployDoucmentDBTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('documentDBTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('networkParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+    {
+        "apiVersion": "2015-01-01",
+        "name": "deployWebAppTemplate",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "uri": "[variables('storageTemplateUrl')]",
+                "contentVersion": "1.0.0.0"
+            },
+            "parametersLink": {
+                "uri": "[variables('storageParameterUrl')]",
+                "contentVersion": "1.0.0.0"
+                }
+            }
+        }
+],
+  "outputs": {
+    "deployDocumentDBResult": {
+      "type": "object",
+      "value": "[reference('deployDoucmentDBTemplate').outputs.deploystorageResult]"
+    },
+    "deployWebAppResult": {
+      "type": "object",
+      "value": "[reference('deployWebAppTemplate').outputs.deployavailabilitysetResult]"
+    }
+  }
+}
