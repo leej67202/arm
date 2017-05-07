@@ -18,24 +18,6 @@
             "defaultValue": "wa",
             "type": "string"
         },
-        "webappLocation": {
-            "type": "string",
-            "allowedValues": [
-                "Australia East",
-                "Australia Southeast",
-                "Southeast Asia",
-                "East Asia",
-                "Japan East",
-                "Japan West",
-                "Korea South",
-                "Korea Central",
-                "West India",
-                "Central India",
-                "South India",
-                "West Europe"
-                ],
-            "defaultValue": "[resourceGroup().location]"
-        },
         "numberOfWebAppCopy": {
             "type": "int",
             "defaultValue": 2
@@ -104,7 +86,7 @@
             "kind": "app",
             "name": "[variables('appservicePlanName')]",
             "apiVersion": "2015-08-01",
-            "location": "[parameters('webappLocation')]",
+            "location": "[resourceGroup().location]",
             "tags": {
                 "Department": "[parameters('serviceTagDept')]",
                 "Owner": "[parameters('serviceTagDept')]",
