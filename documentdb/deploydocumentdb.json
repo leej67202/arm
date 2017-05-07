@@ -64,6 +64,7 @@
 },
 "variables": {
   "resourcePrefix": "[parameters('resourcePrefix')]",
+  "dbAccountOfferType": "Standard",
   "dDBAccountName": "[concat(variables('resourcePrefix'),parameters('dbAccountNamePrefix'))]"
 },
   "resources": [
@@ -82,23 +83,37 @@
               "Data Profile": "[parameters('serviceTagDataProfile')]"
               },
             "properties": {
-                "databaseAccountOfferType": "Standard",
+                "name": "[variables('dDBAccountName')]",
+                "databaseAccountOfferType": "[variables('dbAccountOfferType')]",
                 "consistencyPolicy": {
                     "defaultConsistencyLevel": "Session"
+                  },
+                "locations": [
+                  {
+                    "locationName": "[resourceGroup().location]",
+                    "failoverPriority": 0
+                  }
+                    ]
                 },
-                "name": "[variables('dDBAccountName')]"
-            },
             "dependsOn": []
         }
 ],
   "outputs": {
     "deploypipResult": {
       "value": "[reference(concat('Microsoft.DocumentDB/databaseAccounts/', variables('dDBAccountName')),providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0])]",
-      "type" : "object"
+      "type": "object"
     },
     "deploydocumentDBIdResult": {
       "value": "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('dDBAccountName'))]",
-      "type" : "string"
+      "type": "string"
+    },
+    "deploydocumentDBEndpointResult": {
+      "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('dbAccountNamePrefix'))).documentEndpoint]",
+      "type": "string"
+    },
+    "deploydoucmentDBPrimaryKeyResoult": {
+      "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('dbAccountNamePrefix')), '2015-04-08').primaryMasterKey]",
+      "type": "string"
     }
   }
 }

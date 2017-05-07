@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "appservicePlanNamePrefix": {
-            "defaultValue": "ae-app-standard-plan",
+            "defaultValue": "webapp-standard-plan",
             "type": "string"
         },
         "webappNamePrefix": {
-            "defaultValue": "aechwebappdevops",
+            "defaultValue": "webapp01",
             "type": "string"
         },
         "webappLocation": {

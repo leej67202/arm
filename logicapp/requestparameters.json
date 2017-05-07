@@ -2,10 +2,10 @@
  "$schema":  "http://json-schema.org/draft-04/schema",
  "properties": {
     "customerFirstName": {
-         "value": "Peter"
+         "value": "John"
      },
     "customerLastName": {
-         "value": "Pan"
+         "value": "Lam"
      },
      "customerEmail": {
          "value": "email@outlook.com"

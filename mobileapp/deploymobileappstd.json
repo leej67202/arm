@@ -11,7 +11,7 @@
       }
     },
         "appservicePlanNamePrefix": {
-            "defaultValue": "maplanf101",
+            "defaultValue": "maplans101",
             "type": "string"
         },
         "mobileappNamePrefix": {
@@ -87,7 +87,7 @@
     "variables": {
         "resourcePrefix": "[parameters('resourcePrefix')]",
         "appservicePlanName": "[concat(variables('resourcePrefix'), parameters('appservicePlanNamePrefix'))]",
-        "webappName": "[concat(variables('resourcePrefix'), parameters('mobileappNamePrefix'), uniqueString(resourceGroup().id))]",
+        "mobileappName": "[concat(variables('resourcePrefix'), parameters('mobileappNamePrefix'), uniqueString(resourceGroup().id))]",
         "outIndex": "[sub(parameters('numberOfWebAppCopy'), 1)]"
     },
     "resources": [
@@ -123,7 +123,7 @@
             "apiVersion": "2015-08-01",
             "type": "Microsoft.Web/sites",
             "kind": "mobileapp",
-            "name": "[concat(variables('webappName'),copyIndex(1))]",
+            "name": "[concat(variables('mobileappName'),copyIndex(1))]",
             "location": "[parameters('mobileappLocation')]",
             "tags": {
                 "Department": "[parameters('serviceTagDept')]",
@@ -144,7 +144,7 @@
   ],
   "outputs": {
     "deployvnetResult": {
-      "value": "[reference(concat('Microsoft.Web/sites/', concat(variables('webappName'),string(variables('outIndex')))) ,providers('Microsoft.Web', 'sites').apiVersions[0])]",
+      "value": "[reference(concat('Microsoft.Web/sites/', concat(variables('mobileappName'),string(variables('outIndex')))) ,providers('Microsoft.Web', 'sites').apiVersions[0])]",
       "type" : "object"
     }
   }
