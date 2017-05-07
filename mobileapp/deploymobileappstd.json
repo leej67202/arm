@@ -1,0 +1,151 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourcePrefix": {
+        "type": "string",
+        "maxLength": 60,
+        "defaultValue": "prefix",
+        "metadata": {
+        "description": "resource prefix"
+      }
+    },
+        "appservicePlanNamePrefix": {
+            "defaultValue": "maplanf101",
+            "type": "string"
+        },
+        "mobileappNamePrefix": {
+            "defaultValue": "ma",
+            "type": "string"
+        },
+        "mobileappLocation": {
+            "type": "string",
+            "allowedValues": [
+                "Australia East",
+                "Australia Southeast",
+                "Southeast Asia",
+                "East Asia",
+                "Japan East",
+                "Japan West",
+                "Korea South",
+                "Korea Central",
+                "West India",
+                "Central India",
+                "South India",
+                "West Europe"
+                ],
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "numberOfWebAppCopy": {
+            "type": "int",
+            "defaultValue": 2
+        },
+    "serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+
+    "variables": {
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "appservicePlanName": "[concat(variables('resourcePrefix'), parameters('appservicePlanNamePrefix'))]",
+        "webappName": "[concat(variables('resourcePrefix'), parameters('mobileappNamePrefix'), uniqueString(resourceGroup().id))]",
+        "outIndex": "[sub(parameters('numberOfWebAppCopy'), 1)]"
+    },
+    "resources": [
+        {
+            "comments": "create the web serive plan for web app",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 2
+            },
+            "kind": "mobileapp",
+            "name": "[variables('appservicePlanName')]",
+            "apiVersion": "2015-08-01",
+            "location": "[parameters('mobileappLocation')]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+                },
+            "properties": {
+                "name": "[variables('appservicePlanName')]",
+                "numberOfWorkers": 0
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "create and copy mobile app that depends on the numberOfMobileAppCopy count",
+            "apiVersion": "2015-08-01",
+            "type": "Microsoft.Web/sites",
+            "kind": "mobileapp",
+            "name": "[concat(variables('webappName'),copyIndex(1))]",
+            "location": "[parameters('mobileappLocation')]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "copy": {
+                "name": "mobileappcopy",
+                "count": "[parameters('numberOfWebAppCopy')]"
+            },
+            "properties": {
+                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]"
+            },
+            "dependsOn": []
+        }
+  ],
+  "outputs": {
+    "deployvnetResult": {
+      "value": "[reference(concat('Microsoft.Web/sites/', concat(variables('webappName'),string(variables('outIndex')))) ,providers('Microsoft.Web', 'sites').apiVersions[0])]",
+      "type" : "object"
+    }
+  }
+}
