@@ -2,13 +2,34 @@
 {
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-"parameters": {},
+    "parameters": {
+        "resourcePrefix": {
+        "type": "string",
+        "maxLength": 10,
+        "defaultValue": "prefix",
+        "metadata": {
+        "description": "resource prefix with tow letter"
+        }
+        },
+        "appservicePlanNamePrefix": {
+            "defaultValue": "waplanf101",
+            "type": "string"
+        },
+        "webappNamePrefix": {
+            "defaultValue": "wa",
+            "type": "string"
+        },
+        "numberOfWebAppCopy": {
+            "type": "int",
+            "defaultValue": 2
+        }
+},
+
 "variables": {
   "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
   "documentDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
   "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]",
-  "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/documentdbparameters.json')]",
-  "webappParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/webappfreeparameters.json')]"
+  "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/documentdbparameters.json')]"
 },
 "resources": [
     {
@@ -37,10 +58,26 @@
                 "uri": "[variables('webappTemplateUrl')]",
                 "contentVersion": "1.0.0.0"
             },
-            "parametersLink": {
-                "uri": "[variables('webappParametersUrl')]",
-                "contentVersion": "1.0.0.0"
-                }
+        "parameters": {
+              "resourcePrefix":{
+                "value": "[parameters('resourcePrefix')]"
+              },
+              "appservicePlanNamePrefix":{
+                "value": "[parameters('appservicePlanNamePrefix')]"
+              },
+              "webappNamePrefix":{
+                "value": "[parameters('webappNamePrefix')]"
+              },
+              "numberOfWebAppCopy":{
+                "value": "[parameters('numberOfWebAppCopy')]"
+              },
+              "documentDBEndpoint":{
+                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult]"
+              },
+              "documentDBPrimaryKey":{
+                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydoucmentDBPrimaryKeyResoult]"
+              }
+            }
             }
         }
 ],

@@ -65,7 +65,7 @@
 "variables": {
   "resourcePrefix": "[parameters('resourcePrefix')]",
   "dbAccountOfferType": "Standard",
-  "dDBAccountName": "[concat(variables('resourcePrefix'),parameters('dbAccountNamePrefix'))]"
+  "dDBAccountName": "[concat(variables('resourcePrefix'),parameters('dbAccountNamePrefix'), uniqueString(resourceGroup().id))]"
 },
   "resources": [
         {
@@ -108,12 +108,12 @@
       "type": "string"
     },
     "deploydocumentDBEndpointResult": {
-      "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', variables('dDBAccountName'))).documentEndpoint]",
+      "value": "[concat('https://', variables('dDBAccountName'),'.documents.azure.com:443/')]",
       "type": "string"
     },
     "deploydoucmentDBPrimaryKeyResoult": {
       "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('dDBAccountName')), '2015-04-08').primaryMasterKey]",
-      "type": "string"
+      "type": "securestring"
     }
   }
 }
