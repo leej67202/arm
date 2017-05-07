@@ -123,20 +123,22 @@
             },
             "copy": {
                 "name": "websitescopy",
-                "count": "[parameters('numberOfWebAppCopy')]",
-                "siteConfig": {
-				"phpVersion": "off",
-				"appSettings": [{
-					"Name": "DOCUMENTDB_ENDPOINT",
-					"Value": "[parameters('documentDBEndpoint')]"
-				}, {
-					"Name": "DOCUMENTDB_PRIMARY_KEY",
-					"Value": "[parameters('documentDBPrimaryKey')]"
-				}]
-			    }
+                "count": "[parameters('numberOfWebAppCopy')]"
             },
             "properties": {
-                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]"
+                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]",
+                "siteConfig": {
+				    "phpVersion": "off",
+				        "appSettings": [{
+					        "Name": "DOCUMENTDB_ENDPOINT",
+					        "Value": "[parameters('documentDBEndpoint')]"
+				            },              
+                            {
+					        "Name": "DOCUMENTDB_PRIMARY_KEY",
+					        "Value": "[parameters('documentDBPrimaryKey')]"
+				            }
+                    ]
+			    }
             },
             "dependsOn": []
         }
