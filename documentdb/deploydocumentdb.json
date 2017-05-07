@@ -99,7 +99,7 @@
         }
 ],
   "outputs": {
-    "deploypipResult": {
+    "deploydocumentDBResult": {
       "value": "[reference(concat('Microsoft.DocumentDB/databaseAccounts/', variables('dDBAccountName')),providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0])]",
       "type": "object"
     },

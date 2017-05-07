@@ -142,7 +142,7 @@
         }
   ],
   "outputs": {
-    "deployvnetResult": {
+    "deployWebAppResult": {
       "value": "[reference(concat('Microsoft.Web/sites/', concat(variables('webappName'),string(variables('outIndex')))) ,providers('Microsoft.Web', 'sites').apiVersions[0])]",
       "type" : "object"
     }

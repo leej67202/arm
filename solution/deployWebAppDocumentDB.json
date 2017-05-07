@@ -7,8 +7,8 @@
   "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
   "documentDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
   "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]",
-  "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
-  "webappParametersUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]"
+  "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/documentdbparameters.json')]",
+  "webappParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/webappfreeparameters.json')]"
 },
 "resources": [
     {
@@ -22,7 +22,7 @@
                 "contentVersion": "1.0.0.0"
             },
             "parametersLink": {
-                "uri": "[variables('networkParameterUrl')]",
+                "uri": "[variables('documentDBParametersUrl')]",
                 "contentVersion": "1.0.0.0"
                 }
             }
@@ -34,24 +34,24 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-                "uri": "[variables('storageTemplateUrl')]",
+                "uri": "[variables('webappTemplateUrl')]",
                 "contentVersion": "1.0.0.0"
             },
             "parametersLink": {
-                "uri": "[variables('storageParameterUrl')]",
+                "uri": "[variables('webappParametersUrl')]",
                 "contentVersion": "1.0.0.0"
                 }
             }
         }
 ],
   "outputs": {
-    "deployDocumentDBResult": {
-      "type": "object",
-      "value": "[reference('deployDoucmentDBTemplate').outputs.deploystorageResult]"
+    "deploydocumentDBEndpointResult": {
+      "type": "string",
+      "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult]"
     },
     "deployWebAppResult": {
       "type": "object",
-      "value": "[reference('deployWebAppTemplate').outputs.deployavailabilitysetResult]"
+      "value": "[reference('deployWebAppTemplate').outputs.deployWebAppResult]"
     }
   }
 }
