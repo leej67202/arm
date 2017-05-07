@@ -28,7 +28,7 @@
 "variables": {
   "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
   "documentDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
-  "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappfree.json')]",
+  "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappconfig.json')]",
   "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/documentdbparameters.json')]"
 },
 "resources": [
