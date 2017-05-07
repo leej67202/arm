@@ -108,11 +108,11 @@
       "type": "string"
     },
     "deploydocumentDBEndpointResult": {
-      "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', parameters('dbAccountNamePrefix'))).documentEndpoint]",
+      "value": "[reference(concat('Microsoft.DocumentDb/databaseAccounts/', variables('dDBAccountName'))).documentEndpoint]",
       "type": "string"
     },
     "deploydoucmentDBPrimaryKeyResoult": {
-      "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', parameters('dbAccountNamePrefix')), '2015-04-08').primaryMasterKey]",
+      "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('dDBAccountName')), '2015-04-08').primaryMasterKey]",
       "type": "string"
     }
   }
