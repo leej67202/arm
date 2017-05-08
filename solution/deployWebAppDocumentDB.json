@@ -75,7 +75,7 @@
                 "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult.value]"
               },
               "documentDBPrimaryKey":{
-                "value": "[reference('deployDoucmentDBTemplate').outputs.deploydoucmentDBPrimaryKeyResoult.value]"
+                "value": "[listKeys(reference('deployDoucmentDBTemplate').outputs.deploydocumentDBIdResult.value, '2015-04-08').primaryMasterKey]"
               }
             }
             }

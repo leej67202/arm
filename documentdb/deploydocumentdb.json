@@ -63,6 +63,7 @@
   }
 },
 "variables": {
+  "apiVersion": "2015-04-08",
   "resourcePrefix": "[parameters('resourcePrefix')]",
   "dbAccountOfferType": "Standard",
   "dDBAccountName": "[concat(variables('resourcePrefix'),parameters('dbAccountNamePrefix'), uniqueString(resourceGroup().id))]"
@@ -111,8 +112,8 @@
       "value": "[concat('https://', variables('dDBAccountName'),'.documents.azure.com:443/')]",
       "type": "string"
     },
-    "deploydoucmentDBPrimaryKeyResoult": {
-      "value": "[listKeys(resourceId('Microsoft.DocumentDb/databaseAccounts', variables('dDBAccountName')), '2015-04-08').primaryMasterKey]",
+    "deploydoucmentDBApiVersionResult": {
+      "value": "[variables('apiVersion')]",
       "type": "string"
     }
   }
