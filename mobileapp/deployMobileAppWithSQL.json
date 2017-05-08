@@ -21,11 +21,11 @@
         "appservicePlanSettings": {
             "type": "object",
             "defaultValue": {
-                "skuName": "Free",
-                "tier": "F1",
+                "name": "F1",
+                "tier": "Free",
                 "size": "F1",
                 "family": "F",
-                "capacity": "0"
+                "capacity": 0
             },
         "metadata": {
              "description": "The settings of the existing hosting plan."
@@ -101,11 +101,11 @@
             "comments": "create the web serive plan for web app",
             "type": "Microsoft.Web/serverfarms",
             "sku": {
-                "name": "[parameters('appservicePlanSettings').skuName]",
+                "name": "[parameters('appservicePlanSettings').name]",
                 "tier": "[parameters('appservicePlanSettings').tier]",
                 "size": "[parameters('appservicePlanSettings').size]",
                 "family": "[parameters('appservicePlanSettings').family]",
-                "capacity": "[parameters('appservicePlanSettings').capacity]"
+                "capacity": "[int(parameters('appservicePlanSettings').capacity)]"
             },
             "kind": "mobileapp",
             "name": "[variables('appservicePlanName')]",
@@ -154,7 +154,7 @@
 					    "name": "DOCUMENTDB_PRIMARY_KEY",
 					    "value": "[parameters('documentDBPrimaryKey')]"
 				            }],
-                    "connectionString": [{
+                    "connectionStrings": [{
 					    "name": "MS_SQLDB_CONNECTION_STRING",
 					    "value": "[parameters('documentDBEndpoint')]",
                         "type": "SQLServer"
