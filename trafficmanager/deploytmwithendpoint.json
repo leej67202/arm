@@ -5,7 +5,7 @@
             "resourcePrefix": {
             "type": "string",
             "maxLength": 20,
-            "defaultValue": "sach",
+            "defaultValue": "prefix",
             "metadata": {
             "description": "Internal resource name"
                 }
