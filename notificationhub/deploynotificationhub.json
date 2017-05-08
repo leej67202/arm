@@ -1,0 +1,169 @@
+{
+"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+            "resourcePrefix": {
+            "type": "string",
+            "maxLength": 10,
+            "defaultValue": "prefix",
+            "metadata": {
+            "description": "Resource prefix"
+                }
+            },
+        "notificationHubNamespacePrefix": {
+            "type": "string",
+            "maxLength": 10,
+            "defaultValue": "nh01",
+            "metadata": {
+            "description": "Event Hub namespace prefix format ******.servicebus.windows.net"
+                }
+            },
+        "notificationHubSkuTier": {
+            "type": "string",
+            "allowedValues": [
+                "Free",
+                "Basic",
+                "Standard"
+                ],
+        "defaultValue": "Free",
+        "metadata": {
+            "description": "SKU Tier"
+            }
+        },
+        "hubName": {
+            "defaultValue": "hub1",
+            "type": "string"
+        },
+        "hubAccessManageConnectionStringName": {
+            "defaultValue": "DefaultFullSharedAccessSignature",
+            "type": "string"
+        },
+        "hubAccessListenConnectionStringName": {
+            "defaultValue": "DefaultListenSharedAccessSignature",
+            "type": "string"
+        },
+"serviceTagDept": {
+      "type": "string",
+      "allowedValues": [
+        "IT Ops",
+        "IT Dev",
+        "Finance",
+        "Marketing",
+        "Management",
+        "Sales",
+        "HR"
+      ],
+      "defaultValue": "IT Ops",
+      "metadata": {
+        "description": "Tag for Department"
+    }
+},
+    "serviceTagEnvironment": {
+      "type": "string",
+      "allowedValues": [
+        "Production",
+        "Staging",
+        "QA",
+        "Development"
+      ],
+      "defaultValue": "Staging",
+      "metadata": {
+        "description": "Tag for Enviroment"
+    }
+  },
+    "serviceTagDataProfile": {
+      "type": "string",
+      "allowedValues": [
+        "Confidential",
+        "Restricted",
+        "Internal",
+        "Public"
+      ],
+      "defaultValue": "Internal",
+      "metadata": {
+        "description": "Tag for sensitivity"
+    }
+  }
+},
+    "variables": {
+        "apiVersion": "2014-09-01",
+        "resourcePrefix": "[parameters('resourcePrefix')]",
+        "notificationHubNamespace": "[concat(variables('resourcePrefix'),parameters('notificationHubNamespacePrefix'), uniqueString(resourceGroup().id))]",
+        "hubAccessManageConnectionStringName": "[parameters('hubAccessManageConnectionStringName')]",
+        "hubAccessListenConnectionStringName": "[parameters('hubAccessListenConnectionStringName')]",
+        "hubName": "[concat(variables('notificationHubNamespace'), parameters('hubName'))]",
+        "authRuleHubManageResourceId":"[resourceId('Microsoft.NotificationHubs/namespaces/notificationHubs/AuthorizationRules', variables('notificationHubNamespace'), variables('hubName'), variables('hubAccessManageConnectionStringName'))]",
+        "authRuleHubListenResourceId":"[resourceId('Microsoft.NotificationHubs/namespaces/notificationHubs/AuthorizationRules', variables('notificationHubNamespace'), variables('hubName'), variables('hubAccessListenConnectionStringName'))]"
+   },
+    "resources": [
+            {
+            "apiVersion": "2014-09-01",
+            "name": "[variables('notificationHubNamespace')]",
+            "type": "Microsoft.NotificationHubs/namespaces",
+            "kind": "NotificationHub",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Department": "[parameters('serviceTagDept')]",
+                "Owner": "[parameters('serviceTagDept')]",
+                "Cost Centre": "[parameters('serviceTagDept')]",
+                "Environment": "[parameters('serviceTagEnvironment')]",
+                "Data Profile": "[parameters('serviceTagDataProfile')]"
+            },
+            "properties": {
+                "name": "[variables('notificationHubNamespace')]",
+                "region": "[resourceGroup().location]",
+                "namespaceType": 1
+            },
+            "sku": {
+                "name": "[parameters('notificationHubSkuTier')]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "2014-09-01",
+                    "name": "[variables('hubName')]",
+                    "type": "notificationHubs",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "variables('notificationHubNamespace'))]"
+                    ],
+                    "properties": {
+                        "name": "[variables('hubName')]"
+                    },
+                    "sku": {
+                        "name": "[parameters('notificationHubSkuTier')]"
+                    }
+                }
+            ]
+        }
+    ],
+  "outputs": {
+    "deployNotificationHubResult": {
+        "value": "[reference(concat('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace')),providers('Microsoft.NotificationHubs', 'namespaces').apiVersions[0])]",
+        "type" : "object"
+    },
+    "deployNotificationHubIdResult": {
+        "value": "[resourceid('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))]",
+        "type" : "string"
+    },
+    "deployNotificationHubFQDN": {
+        "value": "[reference(concat('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))).serviceBusEndpoint]",
+        "type" : "string"
+    },
+    "deployHubIdResult": {
+        "value": "[resourceid('Microsoft.NotificationHubs/namespaces/notificationHubs/', variables('notificationHubNamespace'), variables('hubName'))]",
+        "type" : "string"
+    },
+    "deployNotificationHubEndpointResult": {
+        "value": "[concat('https://', variables('notificationHubNamespace'),'.servicebus.windows.net:443/')]",
+        "type": "string"
+    },
+    "hubMangeConnectionStringResult": {
+        "value":"[listkeys(variables('authRuleHubManageResourceId'), variables('apiVersion')).primaryConnectionString]",
+        "type": "string"
+    },
+    "hubListConnectionStringResult": {
+        "value":"[listkeys(variables('authRuleHubListenResourceId'), variables('apiVersion')).primaryConnectionString]",
+        "type": "string"
+    }
+  }
+}
