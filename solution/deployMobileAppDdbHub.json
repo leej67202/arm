@@ -48,10 +48,14 @@
                 }
             }
         },
-    {
+      {
         "apiVersion": "2015-01-01",
-        "name": "deployMobileAppTemplate",
+        "name": "[concat('deployMobileAppTemplate', copyIndex(1))]",
         "type": "Microsoft.Resources/deployments",
+        "copy": {
+                "name": "deployMobileAppcopy",
+                "count": "[parameters('numberOfWebAppCopy')]"
+            },
         "properties": {
             "mode": "Incremental",
             "templateLink": {
@@ -66,10 +70,7 @@
                 "value": "[parameters('appservicePlanNamePrefix')]"
               },
               "mobileappNamePrefix":{
-                "value": "[parameters('mobileappNamePrefix')]"
-              },
-              "numberOfMobileAppCopy":{
-                "value": "[parameters('numberOfWebAppCopy')]"
+                "value": "[concat(parameters('mobileappNamePrefix'), copyIndex(1))]"
               },
               "documentDBEndpoint":{
                 "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult.value]"
