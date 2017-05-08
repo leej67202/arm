@@ -136,10 +136,6 @@
         }
     ],
   "outputs": {
-    "deployNotificationHubResult": {
-        "value": "[reference(concat('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace')),providers('Microsoft.NotificationHubs', 'namespaces').apiVersions[0])]",
-        "type" : "object"
-    },
     "deployNotificationHubIdResult": {
         "value": "[resourceid('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))]",
         "type" : "string"
@@ -152,12 +148,16 @@
         "value": "[concat('https://', variables('notificationHubNamespace'),'.servicebus.windows.net:443/')]",
         "type": "string"
     },
-    "hubMangeConnectionStringResult": {
-        "value":"[listkeys(variables('authRuleHubManageResourceId'), variables('apiVersion')).primaryConnectionString]",
+    "hubMangeConnectionStringIdResult": {
+        "value": "[variables('authRuleHubManageResourceId')]",
         "type": "string"
     },
-    "hubListConnectionStringResult": {
-        "value":"[listkeys(variables('authRuleHubListenResourceId'), variables('apiVersion')).primaryConnectionString]",
+    "hubListConnectionStringIdResult": {
+        "value": "[variables('authRuleHubListenResourceId')]",
+        "type": "string"
+    },
+    "depolyApiVersionResult": {
+       "value": "[variables('apiVersion')]",
         "type": "string"
     }
   }
