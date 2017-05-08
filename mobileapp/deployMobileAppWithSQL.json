@@ -33,25 +33,19 @@
         },
         "mobileappLocation": {
             "type": "string",
-            "allowedValues": [
-                "Australia East",
-                "Australia Southeast",
-                "Southeast Asia",
-                "East Asia",
-                "Japan East",
-                "Japan West",
-                "Korea South",
-                "Korea Central",
-                "West India",
-                "Central India",
-                "South India",
-                "West Europe"
-                ],
             "defaultValue": "[resourceGroup().location]"
         },
         "numberOfWebAppCopy": {
             "type": "int",
             "defaultValue": 2
+        },
+    "documentDBEndpoint": {
+        "defaultValue": "doucumentDBEndpoint",
+        "type": "string"
+        },
+    "documentDBPrimaryKey": {
+        "defaultValue": "primarykey",
+        "type": "string"
         },
     "serviceTagDept": {
       "type": "string",
@@ -96,7 +90,6 @@
     }
   }
 },
-
     "variables": {
         "resourcePrefix": "[parameters('resourcePrefix')]",
         "appservicePlanName": "[concat(variables('resourcePrefix'), parameters('appservicePlanNamePrefix'))]",
@@ -150,9 +143,30 @@
                 "count": "[parameters('numberOfWebAppCopy')]"
             },
             "properties": {
-                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]"
-            },
+                "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]",
+                "siteConfig": {
+				    "phpVersion": "off",
+				    "appSettings": [{
+					    "name": "DOCUMENTDB_ENDPOINT",
+					    "value": "[parameters('documentDBEndpoint')]"
+				            },              
+                        {
+					    "name": "DOCUMENTDB_PRIMARY_KEY",
+					    "value": "[parameters('documentDBPrimaryKey')]"
+				            }],
+                    "connectionString": [{
+					    "name": "MS_SQLDB_CONNECTION_STRING",
+					    "value": "[parameters('documentDBEndpoint')]",
+                        "type": "SQLServer"
+				            },              
+                        {
+					    "name": "MS_NOTIFICATION_HUB_CONNECTION_STRING",
+					    "value": "[parameters('documentDBPrimaryKey')]",
+                        "Type": "Custom"
+                        }]
+                    },
             "dependsOn": []
+            }
         }
   ],
   "outputs": {

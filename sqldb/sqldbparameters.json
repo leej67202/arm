@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "resourcePrefix": {
-        "value": "sach"
+        "value": "prefix"
 	  },
     "sqlServerNamePrefix": {
         "value": "sqlsev01"
@@ -19,6 +19,9 @@
       "sqlServerAdminLogin": {
         "value": "sqladmin"
       },
+  "sqlDBNamePrefix": {
+    "value": "sqldb01"
+    },
     "serviceTagDept": {
       "value": "IT Ops"
     },
