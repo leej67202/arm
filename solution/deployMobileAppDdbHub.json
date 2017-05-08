@@ -8,15 +8,15 @@
         "maxLength": 10,
         "defaultValue": "prefix",
         "metadata": {
-        "description": "resource prefix with tow letter"
+        "description": "resource prefix with two letter"
         }
         },
         "appservicePlanNamePrefix": {
             "defaultValue": "waplanf101",
             "type": "string"
         },
-        "webappNamePrefix": {
-            "defaultValue": "wa",
+        "mobileappNamePrefix": {
+            "defaultValue": "ma",
             "type": "string"
         },
         "numberOfWebAppCopy": {
@@ -28,7 +28,7 @@
 "variables": {
   "templateBaseUrl": "https://raw.githubusercontent.com/leej67202/arm/master/",
   "documentDBTemplateUrl": "[concat(variables('templateBaseUrl'), 'documentdb/deploydocumentdb.json')]",
-  "webappTemplateUrl": "[concat(variables('templateBaseUrl'), 'webapp/deploywebappconfig.json')]",
+  "mobileappTemplateUrl": "[concat(variables('templateBaseUrl'), 'mobileapp/deployMobileAppWithSiteConfig.json')]",
   "documentDBParametersUrl": "[concat(variables('templateBaseUrl'), 'solution/documentdbparameters.json')]"
 },
 "resources": [
@@ -50,12 +50,12 @@
         },
     {
         "apiVersion": "2015-01-01",
-        "name": "deployWebAppTemplate",
+        "name": "deployMobileAppTemplate",
         "type": "Microsoft.Resources/deployments",
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-                "uri": "[variables('webappTemplateUrl')]",
+                "uri": "[variables('mobileappTemplateUrl')]",
                 "contentVersion": "1.0.0.0"
             },
         "parameters": {
@@ -65,10 +65,10 @@
               "appservicePlanNamePrefix":{
                 "value": "[parameters('appservicePlanNamePrefix')]"
               },
-              "webappNamePrefix":{
-                "value": "[parameters('webappNamePrefix')]"
+              "mobileappNamePrefix":{
+                "value": "[parameters('mobileappNamePrefix')]"
               },
-              "numberOfWebAppCopy":{
+              "numberOfMobileAppCopy":{
                 "value": "[parameters('numberOfWebAppCopy')]"
               },
               "documentDBEndpoint":{
@@ -86,7 +86,7 @@
       "type": "string",
       "value": "[reference('deployDoucmentDBTemplate').outputs.deploydocumentDBEndpointResult.value]"
     },
-    "deployWebAppResult": {
+    "deployMobileAppResult": {
       "type": "object",
       "value": "[reference('deployWebAppTemplate').outputs.deployWebAppResult]"
     }

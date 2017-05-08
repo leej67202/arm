@@ -4,7 +4,7 @@
     "parameters": {
         "resourcePrefix": {
         "type": "string",
-        "maxLength": 60,
+        "maxLength": 10,
         "defaultValue": "prefix",
         "metadata": {
         "description": "resource prefix"
@@ -35,7 +35,7 @@
             "type": "string",
             "defaultValue": "[resourceGroup().location]"
         },
-        "numberOfWebAppCopy": {
+        "numberOfMobileAppCopy": {
             "type": "int",
             "defaultValue": 2
         },
@@ -102,7 +102,7 @@
         "resourcePrefix": "[parameters('resourcePrefix')]",
         "appservicePlanName": "[concat(variables('resourcePrefix'), parameters('appservicePlanNamePrefix'))]",
         "mobileappName": "[concat(variables('resourcePrefix'), parameters('mobileappNamePrefix'), uniqueString(resourceGroup().id))]",
-        "outIndex": "[sub(parameters('numberOfWebAppCopy'), 1)]"
+        "outIndex": "[sub(parameters('numberOfMobileAppCopy'), 1)]"
     },
     "resources": [
         {
@@ -148,7 +148,7 @@
             },
             "copy": {
                 "name": "mobileappcopy",
-                "count": "[parameters('numberOfWebAppCopy')]"
+                "count": "[parameters('numberOfMobileAppCopy')]"
             },
             "properties": {
                 "serverFarmId": "[reference(resourceId('Microsoft.Web/serverfarms', variables('appservicePlanName')))]",
@@ -178,8 +178,12 @@
         }
   ],
   "outputs": {
-    "deployvnetResult": {
+    "deployMobileAppResult": {
       "value": "[reference(concat('Microsoft.Web/sites/', concat(variables('mobileappName'),string(variables('outIndex')))) ,providers('Microsoft.Web', 'sites').apiVersions[0])]",
+      "type" : "object"
+    },
+    "deployMobileAppFQDNResult": {
+      "value": "[reference(concat('Microsoft.Web/sites/', variables('mobileAppName'))).hostNames[0]]",
       "type" : "object"
     }
   }
