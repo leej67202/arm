@@ -86,7 +86,7 @@
   }
 },
     "variables": {
-        "apiVersion": "2014-09-01",
+        "apiVersion": "2016-03-01",
         "resourcePrefix": "[parameters('resourcePrefix')]",
         "notificationHubNamespace": "[concat(variables('resourcePrefix'),parameters('notificationHubNamespacePrefix'), uniqueString(resourceGroup().id))]",
         "hubAccessManageConnectionStringName": "[parameters('hubAccessManageConnectionStringName')]",
@@ -97,10 +97,9 @@
    },
     "resources": [
             {
-            "apiVersion": "2014-09-01",
+            "apiVersion": "2016-03-01",
             "name": "[variables('notificationHubNamespace')]",
             "type": "Microsoft.NotificationHubs/namespaces",
-            "kind": "NotificationHub",
             "location": "[resourceGroup().location]",
             "tags": {
                 "Department": "[parameters('serviceTagDept')]",
@@ -119,12 +118,12 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2014-09-01",
+                    "apiVersion": "2016-03-01",
                     "name": "[variables('hubName')]",
                     "type": "notificationHubs",
                     "location": "[resourceGroup().location]",
                     "dependsOn": [
-                        "variables('notificationHubNamespace'))]"
+                        "[concat('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))]"
                     ],
                     "properties": {
                         "name": "[variables('hubName')]"
@@ -143,10 +142,6 @@
     },
     "deployNotificationHubIdResult": {
         "value": "[resourceid('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))]",
-        "type" : "string"
-    },
-    "deployNotificationHubFQDN": {
-        "value": "[reference(concat('Microsoft.NotificationHubs/namespaces/', variables('notificationHubNamespace'))).serviceBusEndpoint]",
         "type" : "string"
     },
     "deployHubIdResult": {
